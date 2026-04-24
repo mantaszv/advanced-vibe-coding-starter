@@ -1,0 +1,39 @@
+{
+  "_comment": "Nukopijuokite šį failą į .mcp.json ir įrašykite savo raktus. NESICOMMIT'inkit .mcp.json — jis .gitignore'e.",
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "<jūsų Supabase Personal Access Token iš https://supabase.com/dashboard/account/tokens>",
+        "SUPABASE_PROJECT_REF": "<jūsų projekto ref, pvz. abcdefghij>"
+      }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "stripe": {
+      "command": "npx",
+      "args": ["-y", "@stripe/mcp@latest", "--tools=all"],
+      "env": {
+        "STRIPE_SECRET_KEY": "<jūsų Stripe test arba restricted raktas, sk_test_... arba rk_...>"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    },
+    "vercel": {
+      "command": "npx",
+      "args": ["-y", "@vercel/mcp-adapter@latest"],
+      "env": {
+        "VERCEL_TOKEN": "<vercel token iš https://vercel.com/account/tokens>"
+      }
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  }
+}
