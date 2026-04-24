@@ -55,3 +55,7 @@ test-results/
 .claude/projects/
 .claude/history/
 .claude/cache/
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json

@@ -27,18 +27,40 @@ command -v git >/dev/null || err "git nerastas."
 ok "git $(git --version | awk '{print $3}')"
 
 # --- 2. MemPalace diegimas ---
-info "Diegiamas MemPalace (pip install mempalace)..."
-if python3 -c "import mempalace" 2>/dev/null; then
-  ok "MemPalace jau įdiegtas"
+info "Diegiamas MemPalace..."
+if command -v mempalace >/dev/null 2>&1; then
+  ok "MemPalace jau įdiegtas ($(mempalace --version 2>/dev/null || echo 'versija nenustatyta'))"
 else
-  python3 -m pip install --user mempalace || err "Nepavyko įdiegti MemPalace"
-  ok "MemPalace įdiegtas"
+  # macOS/Linux su Homebrew Python reikalauja pipx (PEP 668). Fallback — venv.
+  if command -v pipx >/dev/null 2>&1; then
+    info "Naudojamas pipx..."
+    pipx install mempalace || err "pipx install mempalace nepavyko"
+    pipx ensurepath >/dev/null 2>&1 || true
+    # pipx įdiegus reikia perkrauti PATH einamojoje sesijoje
+    export PATH="$HOME/.local/bin:$PATH"
+    ok "MemPalace įdiegtas per pipx"
+  elif command -v brew >/dev/null 2>&1; then
+    warn "pipx nerastas — bandoma brew install pipx"
+    brew install pipx >/dev/null 2>&1 && pipx ensurepath >/dev/null 2>&1 || err "Nepavyko įdiegti pipx per brew"
+    export PATH="$HOME/.local/bin:$PATH"
+    pipx install mempalace || err "pipx install mempalace nepavyko"
+    ok "MemPalace įdiegtas per pipx (naujai)"
+  else
+    # Fallback: vietinis venv projekto kataloge
+    warn "pipx ir brew nerasti — kuriamas vietinis venv (.venv)"
+    python3 -m venv .venv || err "venv kūrimas nepavyko"
+    # shellcheck disable=SC1091
+    source .venv/bin/activate
+    python3 -m pip install --upgrade pip >/dev/null
+    python3 -m pip install mempalace || err "pip install mempalace nepavyko venv'e"
+    ok "MemPalace įdiegtas į .venv/ (aktyvuokite: source .venv/bin/activate)"
+  fi
 fi
 
 # --- 3. MemPalace inicializacija ---
 if [ ! -d ".mempalace" ]; then
   info "Inicializuojamas MemPalace šiame projekte..."
-  mempalace init . || err "mempalace init nepavyko"
+  mempalace init . --yes || err "mempalace init nepavyko"
   ok "MemPalace inicializuotas (.mempalace/)"
 else
   ok "MemPalace jau inicializuotas"

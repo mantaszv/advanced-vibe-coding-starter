@@ -37,14 +37,15 @@ check ".github/workflows/self-heal.yml"    "test -f .github/workflows/self-heal.
 echo ""
 echo "━━━ Priklausomybės ━━━"
 check "python3 pasiekiamas"                "command -v python3"
-check "MemPalace įdiegtas"                 "python3 -c 'import mempalace'"
-check "mempalace CLI pasiekiamas"          "command -v mempalace"
+check "MemPalace CLI pasiekiamas"          "command -v mempalace"
+check "MemPalace veikia"                   "mempalace --version"
 check "Claude Code CLI pasiekiamas"        "command -v claude"
 check "git pasiekiamas"                    "command -v git"
 
 echo ""
 echo "━━━ MemPalace būklė ━━━"
-check "MemPalace inicializuotas"           "test -d .mempalace"
+check "MemPalace inicializuotas (entities.json)" "test -f entities.json"
+check "mempalace.yaml egzistuoja"          "test -f mempalace.yaml"
 check "MemPalace MCP prijungtas"           "claude mcp list 2>/dev/null | grep -q mempalace"
 
 echo ""
