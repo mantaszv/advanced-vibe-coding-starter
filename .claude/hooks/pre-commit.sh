@@ -19,62 +19,51 @@ fi
 BLOCKED=0
 AGENTS_DIR=".claude/agents"
 
-# Guard triggerių žemėlapis — kurie agentai paleisti pagal failų pattern'us
-declare -A TRIGGERS=(
-  ["db-migration-guard"]="^supabase/migrations/"
-  ["payment-guard"]="stripe|checkout|payment|refund"
-  ["language-guard"]="\\.(tsx|ts|md)$"
-  ["file-size-guard"]="^src/"
-  ["test-coverage-guard"]="^src/.*\\.(ts|tsx)$"
-  ["security-guard"]="\\.env|supabase/|auth|middleware"
-)
+# Guard triggerių žemėlapis — kurie agentai paleisti pagal failų pattern'us.
+# Parašyta be `declare -A`, kad veiktų macOS default bash 3.2.
+trigger_pattern() {
+  case "$1" in
+    db-migration-guard)   echo "^supabase/migrations/" ;;
+    payment-guard)        echo "stripe|checkout|payment|refund" ;;
+    language-guard)       echo "\\.(tsx|ts|md)$" ;;
+    file-size-guard)      echo "^src/" ;;
+    test-coverage-guard)  echo "^src/.*\\.(ts|tsx)$" ;;
+    security-guard)       echo "\\.env|supabase/|auth|middleware" ;;
+  esac
+}
+
+TRIGGER_GUARDS="db-migration-guard payment-guard language-guard file-size-guard test-coverage-guard security-guard"
 
 # risk-assessor paleidžiamas VISADA
-ALWAYS_RUN=("risk-assessor")
+ALWAYS_RUN="risk-assessor"
 
 run_guard() {
-  local agent="$1"
-  local agent_file="$AGENTS_DIR/${agent}.md"
+  agent="$1"
+  agent_file="$AGENTS_DIR/${agent}.md"
 
   if [ ! -f "$agent_file" ]; then
-    echo "  ⚠️  Guard $agent nerastas ($agent_file) — praleidžiama"
+    echo "  [WARN] Guard $agent nerastas ($agent_file) -- praleidziama"
     return 0
   fi
 
-  echo "━━━ $agent ━━━"
+  echo "=== $agent ==="
 
-  # Klaudui paduodam agent'o sistem prompt'ą + diff'ą ir laukiam verdikto
-  local prompt
-  prompt=$(cat <<EOF
-$(cat "$agent_file")
+  # Surenkame prompt'ą į tmp failą (išvengiame bash 3.2 heredoc quirks)
+  tmp_prompt=$(mktemp -t guard-prompt.XXXXXX)
+  {
+    cat "$agent_file"
+    printf '\n---\n\n# Pakeitimai peržiūrai (git diff --cached)\n\n```diff\n'
+    printf '%s\n' "$DIFF"
+    printf '```\n\n---\n\n# Paveikti failai\n\n%s\n\n---\n\n' "$CHANGED_FILES"
+    printf 'INSTRUKCIJA: Įvertinkite pakeitimus pagal guard taisykles. Pirmoje eilutėje grąžinkite TIKSLIAI vieną iš:\n'
+    printf -- '- VERDICT: OK -- jei pakeitimai saugūs\n'
+    printf -- '- VERDICT: WARN -- jei yra rizikų, bet commitas galimas\n'
+    printf -- '- VERDICT: BLOCKED -- jei commitas turi būti sustabdytas\n\n'
+    printf 'Po to -- iki 10 eilučių paaiškinimo.\n'
+  } > "$tmp_prompt"
 
----
-
-# Pakeitimai peržiūrai (git diff --cached)
-
-\`\`\`diff
-$DIFF
-\`\`\`
-
----
-
-# Paveikti failai
-
-$CHANGED_FILES
-
----
-
-INSTRUKCIJA: Įvertinkite pakeitimus pagal šio guard'o taisykles. Pirmoje eilutėje grąžinkite TIKSLIAI:
-- \`VERDICT: OK\` — jei pakeitimai saugūs
-- \`VERDICT: WARN\` — jei yra rizikų, bet commit galimas
-- \`VERDICT: BLOCKED\` — jei commit turi būti sustabdytas
-
-Po to — iki 10 eilučių paaiškinimo.
-EOF
-)
-
-  local result
-  result=$(echo "$prompt" | claude --print --max-tokens 500 2>/dev/null || echo "VERDICT: WARN\n(claude CLI klaida — guard praleistas)")
+  result=$(claude --print < "$tmp_prompt" 2>/dev/null || echo "VERDICT: WARN")
+  rm -f "$tmp_prompt"
 
   echo "$result" | head -12
 
@@ -84,13 +73,13 @@ EOF
 }
 
 # Visada paleidžiami
-for agent in "${ALWAYS_RUN[@]}"; do
+for agent in $ALWAYS_RUN; do
   run_guard "$agent"
 done
 
 # Trigger-based
-for agent in "${!TRIGGERS[@]}"; do
-  pattern="${TRIGGERS[$agent]}"
+for agent in $TRIGGER_GUARDS; do
+  pattern=$(trigger_pattern "$agent")
   if echo "$CHANGED_FILES" | grep -qE "$pattern"; then
     run_guard "$agent"
   fi
