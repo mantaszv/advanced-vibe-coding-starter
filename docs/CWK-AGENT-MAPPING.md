@@ -1,66 +1,69 @@
 # CWK Agent Mapping
 
-CWK (Claude Workflow Kit) 4-stage pipeline komandos (`/create-prd`, `/generate-tasks`, `/process-tasks`, `/process-tasks-batch`) buvo port'intos į šį starter kit'ą. Originaliai CWK referencijavo savo guard agentus EN-stiliaus pavadinimais. **Šiame starter kit'e tie pavadinimai pakeisti į starter'io 7 LT-stiliaus guard'us** dar port'inimo metu (žr. `scripts/port-cwk.sh`).
+CWK (Claude Workflow Kit) 4 etapų pipeline komandos (`/create-prd`, `/generate-tasks`, `/process-tasks`, `/process-tasks-batch`) buvo port'intos į šį starter kit'ą. Originalus CWK savo guard'us vadino EN konvencija. **Šiame starter kit'e tie pavadinimai pakeisti į starter'io 7 LT guard'us** dar port'inimo metu. Žr. `scripts/port-cwk.sh`.
 
-Šis failas dokumentuoja mapping'ą, kad dalyvis nebūtų suklaidintas, jei grįš į originalų CWK.
+Šis failas dokumentuoja atitikmenis. Jei dalyvis grįš į originalų CWK, jam bus aiškiau, kas į ką pakeista.
 
-## Guard pavadinimų mapping'as
+## Guard'ų pavadinimų atitikmenys
 
-| CWK originalus (EN) | Starter atitikmuo (LT) | Funkcija |
+| CWK originalas (EN) | Starter atitikmuo (LT) | Funkcija |
 |---|---|---|
 | `payment-guardian` | `payment-guard` | Stripe idempotency, kainų logika, webhook signatures |
 | `db-guardian` | `db-migration-guard` | Destruktyvių migracijų blokavimas, rollback validacija |
-| `lang-reviewer` | `language-guard` | LT/EN konvencijų atitikimas (UI — LT, kodas — EN) |
-| `file-splitter` | `file-size-guard` | ≤ 300 LOC failai, ≤ 50 LOC funkcijos |
-| `risk-assessor` | `risk-assessor` | (vienodi) Low/medium/high rizikos vertinimas PR'ams |
+| `lang-reviewer` | `language-guard` | LT, EN konvencijų atitikimas (UI lietuviškai, kodas angliškai) |
+| `file-splitter` | `file-size-guard` | Failai iki 300 LOC, funkcijos iki 50 LOC |
+| `risk-assessor` | `risk-assessor` | Vienodi. Žemos, vidutinės, aukštos rizikos vertinimas PR'ams |
 
-## Starter ekstra guardai (CWK neturi)
+## Starter'io ekstra guard'ai (CWK neturi)
 
-Starter kit'e dar du guard'ai, kurie CWK pipeline komandose tiesiogiai nereferencijuojami, bet veikia kaip `pre-commit` apsaugos sluoksnis:
+Starter kit'e du papildomi guard'ai. CWK pipeline komandos jų tiesiogiai necituoja, bet jie veikia kaip `pre-commit` apsauga:
 
 | Starter guard | Funkcija |
 |---|---|
-| `security-guard` | Secret leaks (.env*, raktai), RLS trūkumai, CSP, open redirect, SSRF |
-| `test-coverage-guard` | Testų coverage ≥ 80% paveiktiems failams, E2E privalomi kritiniam flow |
+| `security-guard` | Secret nutekėjimai (`.env*`, raktai), RLS spragos, CSP, open redirect, SSRF |
+| `test-coverage-guard` | Testų coverage bent 80% paveiktiems failams. E2E privalomi kritiniam flow'ui |
 
-## CWK papildomi guard'ai (NEPORTAVAI)
+## CWK guard'ai, kurių NEport'inome
 
-CWK turėjo 8 guard'us. 5 (lentelė viršuje) sumapinti į starter'io LT atitikmenis. Likę 3 **NEbuvo importuoti** — jų funkcionalumas dengia kitus mechanizmus:
+CWK turi 8 guard'us. Penki iš jų yra lentelėje viršuje. Likę trys **neportuoti**, nes jų funkcionalumą dengia kiti mechanizmai:
 
 | CWK guard'as | Kodėl neportuotas |
 |---|---|
-| `pre-deploy` | Dengia `scripts/verify.sh` + `.github/workflows/self-heal.yml` |
-| `dependency-guardian` | `npm audit` patikrinimai dengia `security-guard`'ą |
+| `pre-deploy` | Funkcionalumą dengia `scripts/verify.sh` ir `.github/workflows/self-heal.yml` |
+| `dependency-guardian` | `npm audit` ir kiti dependency check'ai dengia `security-guard` |
 | `test-quality-guardian` | Persidengia su starter'io `test-coverage-guard` |
 
-## Skills referencijos
+## Skill'ų referencijos
 
-CWK komandos kelis kartus referencijuoja `superpowers:test-driven-development` ir kitus skill'us. Šie skill'ai yra **opcionalūs**:
+CWK komandos kelis kartus mini `superpowers:test-driven-development` ir kitus skill'us. Šie skill'ai yra **opcionalūs**:
 
-- Jei dalyvis turi įdiegtą `superpowers` plugin'ą — komandos juos automatiškai naudos.
-- Jei ne — komandos veiks be skill'ų pagalbos. Tai NĖRA klaida.
+- Jei dalyvis turi įdiegtą `superpowers` plugin'ą, komandos jį naudos automatiškai.
+- Jei ne, komandos veiks be skill'o pagalbos. Tai nėra klaida.
 
-## Path konvencijos
+Port'inimo skriptas pažymi tokias referencijas kaip `(optional)`, kad dalyvis suprastų situaciją.
 
-CWK numatė PRD/tasks failų vietas:
+## Path'ų konvencijos
+
+CWK originale PRD ir tasks failai gyvena čia:
+
 - `tasks/prd-{slug}.md` (PRD)
 - `tasks/tasks-prd-{slug}.md` (task list)
 
-**Starter kit'e** (port'avimo metu pakeista):
+Starter kit'as port'inimo metu pakeičia tas vietas į savąsias:
+
 - `docs/requirements/REQ-YYYY-MM-DD-NNN-{slug}.md` (PRD)
 - `docs/tasks/TASK-{slug}.md` (task list)
 
-Šios path'ai atitinka starter'io `CLAUDE.md` §2.1 numatytą struktūrą.
+Šie path'ai atitinka starter'io `CLAUDE.md` §2.1 numatytą struktūrą.
 
-## Kaip atnaujinti komandas po CWK release
+## Kaip atnaujinti komandas po CWK release'o
 
-Jei CWK upstream (`/Users/auris/Documents/GitHub/claude-workflow-kit/commands/`) atnaujinamas:
+Jei CWK upstream'as (`/Users/auris/Documents/GitHub/claude-workflow-kit/commands/`) atnaujinamas, paleiskite:
 
 ```bash
 bash scripts/port-cwk.sh
-# Sugeneruoja .claude/commands/_templates/ iš naujo.
-# Patikrina, kad nėra likusių EN guard vardų ar tasks/ path'ų.
-# Dalyvio setup.sh perkurs .claude/commands/*.md su nauja stack-aware substitucija.
 ```
 
-`_templates/` turi būti commit'inta; `.claude/commands/*.md` — `.gitignore`'inami (generuojami).
+Skriptas sugeneruoja `.claude/commands/_templates/` iš naujo. Patikrina, kad nelieka senų EN guard vardų ar `tasks/` path'ų. Dalyvio `setup.sh` paskui perkurs `.claude/commands/*.md` su jo stack'ui pritaikytomis komandomis.
+
+`_templates/` turi būti commit'inta. `.claude/commands/*.md` ignoruojami git'e, nes juos sugeneruoja `setup.sh`.

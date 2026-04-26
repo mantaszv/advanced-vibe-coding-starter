@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Advanced Vibe Coding Starter — verifikacija
+# Advanced Vibe Coding Starter. Verifikacija
 # Paleidžiama po setup.sh. Patikrina, kad visi komponentai vietoje.
 
 set -uo pipefail
@@ -69,10 +69,10 @@ printf "Praėjo: \033[1;32m%d\033[0m | Nepraėjo: \033[1;31m%d\033[0m\n" "$PASS"
 
 if [ "$FAIL" -gt 0 ]; then
   echo ""
-  echo "Jei kuris nors patikrinimas nepraėjo — paleiskite: bash scripts/setup.sh"
+  echo "Jei kuris nors patikrinimas nepraėjo. Paleiskite: bash scripts/setup.sh"
   echo "(setup.sh idempotentinis: aptinka tinkamą python interpretatorių, perinit'ina partial state'us"
   echo " ir užregistruoja MemPalace MCP. Saugu paleisti pakartotinai.)"
   echo ""
-  echo "Jei MemPalace iš viso neįdiegtas — rankiniu būdu: pipx install mempalace"
+  echo "Jei MemPalace iš viso neįdiegtas. Rankiniu būdu: pipx install mempalace"
   exit 1
 fi

@@ -4,7 +4,7 @@ Show the current progress of a task list: $ARGUMENTS
 
 ## Process
 
-1. **Find the task file**: If `$ARGUMENTS` is provided, use it as the file path. Otherwise, look for the most recently modified `tasks-*.md` file in the `/tasks` directory.
+1. **Find the task file**: If `$ARGUMENTS` is provided, use it as the file path. Otherwise, look for the most recently modified `TASK-*.md` file in the `docs/tasks/` directory.
 
 2. **Parse the task file**: Read the file and extract:
    - All parent tasks (`- [ ]` or `- [x]` with bold number+title)

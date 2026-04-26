@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Advanced Vibe Coding Starter — setup script
+# Advanced Vibe Coding Starter. Setup script
 # Paleidžia viską, ko reikia, kad dalyvis per 5 min turėtų veikiančią aplinką.
 
 set -euo pipefail
@@ -15,7 +15,7 @@ ok()    { printf "\033[1;32m[ OK ]\033[0m %s\n" "$*"; }
 warn()  { printf "\033[1;33m[WARN]\033[0m %s\n" "$*"; }
 err()   { printf "\033[1;31m[ERR ]\033[0m %s\n" "$*" >&2; exit 1; }
 
-# Stack auto-detection (port'as iš CWK install.sh:40-147). AUTO mode — neklausia
+# Stack auto-detection (port'as iš CWK install.sh:40-147). AUTO mode. Neklausia
 # dalyvio jokių klausimų, naudoja default'us pagal aptiktą stack'ą.
 detect_project() {
   PROJECT_LANG=""
@@ -25,7 +25,7 @@ detect_project() {
   PROJECT_HOSTING=""
   PROJECT_TEST=""
 
-  # Language / Runtime — Node prioritetas (monorepo Node+Python atveju Node laimi)
+  # Language / Runtime. Node prioritetas (monorepo Node+Python atveju Node laimi)
   if [ -f "package.json" ]; then
     PROJECT_LANG="node"
     if grep -q '"typescript"' package.json 2>/dev/null; then
@@ -42,7 +42,7 @@ detect_project() {
     PROJECT_LANG="rust"
   fi
 
-  # Node frameworks — pagal package.json
+  # Node frameworks. Pagal package.json
   if [ -f "package.json" ] && [ -z "$PROJECT_FRAMEWORK" ]; then
     if grep -q '"next"' package.json; then
       PROJECT_FRAMEWORK="nextjs"
@@ -61,7 +61,7 @@ detect_project() {
     fi
   fi
 
-  # DB — pagal package.json arba supabase/ dir
+  # DB. Pagal package.json arba supabase/ dir
   if [ -f "package.json" ]; then
     if grep -q '"@supabase/supabase-js"' package.json; then
       PROJECT_DB="supabase"
@@ -107,7 +107,14 @@ detect_project() {
 configure_project_auto() {
   COVERAGE_THRESHOLD="80"
   MAX_FILE_LINES="300"
-  UI_LANG="lt"
+
+  # UI_LANG: jei .cwk-config.json jau egzistuoja, paveldim ankstesnio paleidimo reikšmę.
+  # Kitu atveju default'as `lt`. Dalyvis gali nustatyti rankomis prieš re-paleidžiant setup.sh.
+  if [ -f .claude/.cwk-config.json ] && command -v jq >/dev/null 2>&1; then
+    UI_LANG=$(jq -r '.config.ui_language // "lt"' .claude/.cwk-config.json 2>/dev/null || echo "lt")
+  else
+    UI_LANG="lt"
+  fi
 
   case "$PROJECT_LANG" in
     python)
@@ -141,7 +148,7 @@ configure_project_auto() {
       ;;
     "")
       # Stack neaptiktas (jokio package.json / manage.py / Cargo.toml / go.mod).
-      # Naudojam neutralius placeholder'ius — dalyvis pats sukonfigūruos.
+      # Naudojam neutralius placeholder'ius. Dalyvis pats sukonfigūruos.
       # Speciali išimtis: jei egzistuoja `scripts/verify.sh`, jis tampa de facto test komanda.
       BUILD_CMD="(nesukonfigūruota)"
       LINT_CMD="(nesukonfigūruota)"
@@ -150,14 +157,14 @@ configure_project_auto() {
       else
         TEST_CMD="(nesukonfigūruota)"
       fi
-      warn "Stack'as neaptiktas — komandos paliekamos kaip placeholder'iai. Atnaujinkite .claude/.cwk-config.json arba pridėkite stack žymeklį (package.json / manage.py / Cargo.toml / go.mod)."
+      warn "Stack'as neaptiktas. Komandos paliekamos kaip placeholder'iai. Atnaujinkite .claude/.cwk-config.json arba pridėkite stack žymeklį (package.json / manage.py / Cargo.toml / go.mod)."
       ;;
     *)
       # Žinoma kalba, bet bez specifinio palaikymo (pvz. java, ruby).
       BUILD_CMD="(nesukonfigūruota: $PROJECT_LANG)"
       LINT_CMD="(nesukonfigūruota: $PROJECT_LANG)"
       TEST_CMD="(nesukonfigūruota: $PROJECT_LANG)"
-      warn "Stack'as '$PROJECT_LANG' nepalaikomas auto-konfigūracijoje — atnaujinkite .claude/.cwk-config.json rankomis."
+      warn "Stack'as '$PROJECT_LANG' nepalaikomas auto-konfigūracijoje. Atnaujinkite .claude/.cwk-config.json rankomis."
       ;;
   esac
 }
@@ -181,7 +188,7 @@ info "Diegiamas MemPalace..."
 if command -v mempalace >/dev/null 2>&1; then
   ok "MemPalace jau įdiegtas ($(mempalace --version 2>/dev/null || echo 'versija nenustatyta'))"
 else
-  # macOS/Linux su Homebrew Python reikalauja pipx (PEP 668). Fallback — venv.
+  # macOS/Linux su Homebrew Python reikalauja pipx (PEP 668). Fallback. Venv.
   if command -v pipx >/dev/null 2>&1; then
     info "Naudojamas pipx..."
     pipx install mempalace || err "pipx install mempalace nepavyko"
@@ -190,14 +197,14 @@ else
     export PATH="$HOME/.local/bin:$PATH"
     ok "MemPalace įdiegtas per pipx"
   elif command -v brew >/dev/null 2>&1; then
-    warn "pipx nerastas — bandoma brew install pipx"
+    warn "pipx nerastas. Bandoma brew install pipx"
     brew install pipx >/dev/null 2>&1 && pipx ensurepath >/dev/null 2>&1 || err "Nepavyko įdiegti pipx per brew"
     export PATH="$HOME/.local/bin:$PATH"
     pipx install mempalace || err "pipx install mempalace nepavyko"
     ok "MemPalace įdiegtas per pipx (naujai)"
   else
     # Fallback: vietinis venv projekto kataloge
-    warn "pipx ir brew nerasti — kuriamas vietinis venv (.venv)"
+    warn "pipx ir brew nerasti. Kuriamas vietinis venv (.venv)"
     python3 -m venv .venv || err "venv kūrimas nepavyko"
     # shellcheck disable=SC1091
     source .venv/bin/activate
@@ -211,12 +218,12 @@ fi
 # `mempalace init . --yes` sukuria DU artefaktus projekto šaknyje:
 #   - mempalace.yaml (config)
 #   - entities.json (auto-detected entities)
-# Re-run init'ą, jei trūksta bent vieno (apsauga nuo partial-failure scenarijaus —
-# pvz., procesas mirė tarp dviejų write operacijų, arba dalyvis ištrynė vieną failą).
+# Re-run init'ą, jei trūksta bent vieno failo. Tai apsauga nuo partial-failure scenarijaus.
+# Pavyzdžiui, procesas mirė tarp dviejų write operacijų. Arba dalyvis pats ištrynė vieną failą.
 # `~/.mempalace/` yra globalus palace home, NE projekto init žymeklis.
 if [ ! -f "mempalace.yaml" ] || [ ! -f "entities.json" ]; then
   if [ -f "mempalace.yaml" ] || [ -f "entities.json" ]; then
-    warn "Aptiktas partial init state — perinit'inama"
+    warn "Aptiktas partial init state. Perinit'inama"
   else
     info "Inicializuojamas MemPalace šiame projekte..."
   fi
@@ -227,8 +234,8 @@ else
 fi
 
 # --- 4. Claude Code MCP prijungimas ---
-# Aptikti tinkamą python, kuris turi `mempalace` modulį (pipx izoliuoja venv'e —
-# todėl sistemos `python`/`python3` paprastai jo neturi).
+# Aptikti tinkamą python, kuris turi `mempalace` modulį.
+# pipx izoliuoja modulį venv'e. Todėl sistemos `python` arba `python3` paprastai jo neturi.
 # Tvarka: plain python → pipx environment query → hardcoded pipx paths → .venv → shebang fallback.
 detect_mempalace_python() {
   local cmd path candidate pipx_venvs python_subpath
@@ -273,7 +280,7 @@ detect_mempalace_python() {
     return 0
   fi
 
-  # 5. Shebang parsing — paskutinis šansas. Tinkamai apdoroja `#!/usr/bin/env python3`
+  # 5. Shebang parsing. Paskutinis šansas. Tinkamai apdoroja `#!/usr/bin/env python3`
   # (pirmas token = /usr/bin/env, antras = python3 → resolve per PATH).
   local mp_bin shebang_line first second python_path
   mp_bin=$(command -v mempalace 2>/dev/null) || return 1
@@ -304,7 +311,7 @@ MEMPALACE_PY=""
 if MEMPALACE_PY=$(detect_mempalace_python); then
   ok "MemPalace python interpretatorius: $MEMPALACE_PY"
 else
-  warn "Nepavyko aptikti python su 'mempalace' moduliu — MCP registracija praleidžiama"
+  warn "Nepavyko aptikti python su 'mempalace' moduliu. MCP registracija praleidžiama"
   MEMPALACE_PY=""
 fi
 
@@ -312,7 +319,7 @@ if [ -n "$MEMPALACE_PY" ]; then
   # Pašalinti seną sulūžusią registraciją (jei dalyvis paleido senesnę setup.sh versiją)
   EXISTING_CMD=$(claude mcp get mempalace 2>/dev/null | awk '/^  Command:/ {print $2}' || true)
   if [ -n "$EXISTING_CMD" ] && [ "$EXISTING_CMD" != "$MEMPALACE_PY" ]; then
-    warn "Aptikta sena MemPalace MCP registracija ($EXISTING_CMD) — perregistruojama"
+    warn "Aptikta sena MemPalace MCP registracija ($EXISTING_CMD). perregistruojama"
     claude mcp remove mempalace -s local >/dev/null 2>&1 || true
   fi
 
@@ -322,7 +329,7 @@ if [ -n "$MEMPALACE_PY" ]; then
     if claude mcp add mempalace -- "$MEMPALACE_PY" -m mempalace.mcp_server >/dev/null 2>&1; then
       ok "MemPalace MCP prijungtas"
     else
-      warn "claude mcp add nepavyko — pridėkite rankiniu būdu:"
+      warn "claude mcp add nepavyko. Pridėkite rankiniu būdu:"
       warn "  claude mcp add mempalace -- $MEMPALACE_PY -m mempalace.mcp_server"
     fi
   fi
@@ -343,7 +350,7 @@ TEMPLATES_DIR=".claude/commands/_templates"
 COMMANDS_DIR=".claude/commands"
 
 if [ ! -d "$TEMPLATES_DIR" ]; then
-  warn "$TEMPLATES_DIR nerastas — CWK pipeline komandos neįdiegiamos"
+  warn "$TEMPLATES_DIR nerastas. CWK pipeline komandos neįdiegiamos"
 else
   info "Generuojamos CWK pipeline komandos iš _templates/..."
   count=0
@@ -372,7 +379,7 @@ else
   fi
 fi
 
-# .cwk-config.json — single source of truth metadata
+# .cwk-config.json. Single source of truth metadata
 if command -v jq >/dev/null 2>&1; then
   jq -n \
     --arg version "$CWK_VERSION" \
@@ -403,20 +410,30 @@ if command -v jq >/dev/null 2>&1; then
     }' > .claude/.cwk-config.json
   ok ".cwk-config.json (v$CWK_VERSION) sukurtas"
 else
-  warn "jq nerastas — .cwk-config.json praleidžiamas. Įdiekite: brew install jq (macOS) arba apt install jq (Linux)"
+  warn "jq nerastas. .cwk-config.json praleidžiamas. Įdiekite: brew install jq (macOS) arba apt install jq (Linux)"
 fi
 
-# Stop hook'as į settings.json (priminimas po sesijos paleisti build/test/lint)
+# Stop hook'as primena po sesijos paleisti build, test, lint komandas.
+# Mūsų hook'as pažymimas marker'iu CWK_STOP_HOOK_V1, kad re-run'as atnaujintų tik mūsų įrašą,
+# o ne perrašytų dalyvio paties pridėtus Stop hook'us.
 if command -v jq >/dev/null 2>&1 && [ -f .claude/settings.json ]; then
-  STOP_PROMPT="Prieš baigiant šią sesiją: jei buvo kodo pakeitimų, patvirtinkite, kad 1) Kompiliuoja (${BUILD_CMD}), 2) Testai praeina (${TEST_CMD}), 3) Be lint klaidų (${LINT_CMD}). Jei kuris žingsnis NEbuvo paleistas — įspėkite vartotoją. NEblokuoti — tik priminti."
+  STOP_MARKER="CWK_STOP_HOOK_V1"
+  STOP_PROMPT="[${STOP_MARKER}] Prieš baigiant šią sesiją: jei buvo kodo pakeitimų, patvirtinkite, kad 1) Kompiliuoja (${BUILD_CMD}), 2) Testai praeina (${TEST_CMD}), 3) Be lint klaidų (${LINT_CMD}). Jei kuris žingsnis NEbuvo paleistas, įspėkite vartotoją. NEblokuoti, tik priminti."
   TMP_SETTINGS=$(mktemp)
-  jq --arg prompt "$STOP_PROMPT" \
-    '.hooks = (.hooks // {}) | .hooks.Stop = [{matcher: ".*", hooks: [{type: "prompt", prompt: $prompt, timeout: 10}]}]' \
-    .claude/settings.json > "$TMP_SETTINGS" && mv "$TMP_SETTINGS" .claude/settings.json
-  ok "Stop hook'as įmerge'intas į .claude/settings.json"
+  # Filtruojam senus CWK įrašus (pagal marker'į), tada pridedam šviežią. Kiti dalyvio Stop hook'ai išlieka.
+  jq --arg prompt "$STOP_PROMPT" --arg marker "$STOP_MARKER" '
+    .hooks = (.hooks // {}) |
+    .hooks.Stop = (
+      ((.hooks.Stop // []) | map(select(
+        (.hooks // []) | map(.prompt // "") | any(contains($marker)) | not
+      ))) +
+      [{matcher: ".*", hooks: [{type: "prompt", prompt: $prompt, timeout: 10}]}]
+    )
+  ' .claude/settings.json > "$TMP_SETTINGS" && mv "$TMP_SETTINGS" .claude/settings.json
+  ok "Stop hook'as atnaujintas .claude/settings.json (kiti dalyvio hook'ai išsaugoti)"
 fi
 
-# .mcp.json.suggested — filtruotas variantas pagal aptiktą stack'ą
+# .mcp.json.suggested. Filtruotas variantas pagal aptiktą stack'ą
 if [ -f .mcp.json.example ] && command -v jq >/dev/null 2>&1; then
   KEEP_FILTER=$(jq -n \
     --arg db "$PROJECT_DB" \
@@ -427,7 +444,7 @@ if [ -f .mcp.json.example ] && command -v jq >/dev/null 2>&1; then
       supabase: ($db == "supabase"),
       stripe:   ($pay == "stripe"),
       vercel:   ($host == "vercel"),
-      playwright: ($test == "playwright" or $test == "vitest" or $test == "jest"),
+      playwright: ($test == "playwright"),
       context7: true,
       "chrome-devtools": true
     }')
@@ -460,8 +477,8 @@ fi
 
 # --- 9. Pradinis mine (jei raw/ nėra tuščias) ---
 if [ -n "$(ls -A raw/ 2>/dev/null | grep -v .gitkeep || true)" ]; then
-  info "raw/ turi failų — paleidžiama mempalace mine..."
-  mempalace mine . || warn "mempalace mine nepavyko — galite paleisti vėliau"
+  info "raw/ turi failų. Paleidžiama mempalace mine..."
+  mempalace mine . || warn "mempalace mine nepavyko. Galite paleisti vėliau"
 fi
 
 printf "\n\033[1;32m━━━ SETUP BAIGTAS ━━━\033[0m\n"

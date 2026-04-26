@@ -6,7 +6,7 @@ Apjungia tris atminties + discipline sluoksnius į vieną klonavimui paruoštą 
 
 | Sluoksnis | Projektas | Kam skirta |
 |---|---|---|
-| **Taisyklės** | [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | 4 Karpathy principai — įtraukti į `CLAUDE.md` |
+| **Taisyklės** | [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | 4 Karpathy principai. Įtraukti į `CLAUDE.md` |
 | **Atmintis** | [MemPalace](https://github.com/MemPalace/mempalace) | Semantinė paieška + 29 MCP įrankiai |
 | **Žinynas** | [Memoriki](https://github.com/AyanbekDos/memoriki) | `raw/ → wiki/` wiki pipeline ant MemPalace |
 
@@ -18,7 +18,7 @@ Papildomai pridėti: 7 guard agentai, 4-fazių pipeline šablonai, Self-Healing 
 
 - **Python 3.9+** (MemPalace)
 - **Node 18+** (jei naudosite Next.js projekte)
-- **Claude Code CLI ≥ 1.0** — [diegimas](https://docs.claude.com/claude-code)
+- **Claude Code CLI ≥ 1.0**. [diegimas](https://docs.claude.com/claude-code)
 - **git**
 
 ## Greitas diegimas (5 min)
@@ -44,11 +44,11 @@ claude
 
 ## Ką `scripts/setup.sh` padaro
 
-1. **Įdiegia MemPalace** per `pipx install mempalace` (fallback: `brew install pipx` → pipx, paskutinis atvejis — vietinis `.venv/`).
-2. **Inicializuoja palace projekte** — `mempalace init . --yes` sukuria `mempalace.yaml` ir `entities.json` projekto šaknyje. Pati saugykla gyvena `~/.mempalace/` (globali, dalinama tarp visų jūsų projektų — kiekvienas projektas turi savo *wing*).
-3. **Prijungia MCP serverį** — aptinka python interpretatorių, kuris turi `mempalace` modulį (svarbu macOS pipx atveju, kur sistemos `python` jo neturi), ir registruoja: `claude mcp add mempalace -- <python> -m mempalace.mcp_server`.
-4. **Nustato pre-commit hook** — `.claude/hooks/pre-commit.sh` +x, susieja su `.git/hooks/pre-commit`.
-5. **Pradinis mine** — jei `raw/` turi failų, paleidžia `mempalace mine .` (idempotentinis).
+1. **Įdiegia MemPalace** per `pipx install mempalace`. Atsarginiai variantai. `brew install pipx`, jei pipx dar nėra, arba vietinis `.venv/`, jei nei pipx, nei brew.
+2. **Inicializuoja palace projekte.** `mempalace init . --yes` sukuria `mempalace.yaml` ir `entities.json` projekto šaknyje. Pati saugykla gyvena `~/.mempalace/`. Tai globali vieta, dalinama tarp visų jūsų projektų. Kiekvienas projektas joje turi savo *wing*.
+3. **Prijungia MCP serverį.** Aptinka python interpretatorių, kuris turi `mempalace` modulį. Tai svarbu macOS pipx atveju, kur sistemos `python` modulio neturi. Užregistruoja: `claude mcp add mempalace -- <python> -m mempalace.mcp_server`.
+4. **Nustato pre-commit hook'ą.** `.claude/hooks/pre-commit.sh` +x, susieja su `.git/hooks/pre-commit`.
+5. **Pradinis mine.** Jei `raw/` turi failų, paleidžia `mempalace mine .`. Komanda idempotentinė.
 
 ## Struktūra
 
@@ -102,19 +102,19 @@ Pilna metodika: žr. `ADVANCED-VIBE-CODING-Meistrystes-Vadovas.md`.
 
 Plius **MemPalace** (7-as, iš `mempalace init`).
 
-## 5 slash komandos (CWK 4-stage pipeline, v3.0.1)
+## 5 slash komandos (CWK 4 etapų pipeline, v3.0.1)
 
-`scripts/setup.sh` aptinka jūsų stack'ą (Node.js/TypeScript, Next.js/Vite-React, Python, Django, Rust, Go) ir generuoja `.claude/commands/*.md` su stack-specific komandų default'ais (`build_cmd`, `lint_cmd`, `test_cmd`):
+`scripts/setup.sh` aptinka jūsų stack'ą (Node.js, TypeScript, Next.js, Vite-React, Python, Django, Rust, Go) ir sugeneruoja failus `.claude/commands/*.md` su tinkamomis komandomis (`build_cmd`, `lint_cmd`, `test_cmd`).
 
 | # | Komanda | Paskirtis |
 |---|---|---|
-| 1 | `/create-prd "<aprašymas>"` | PRD su Orchestration Hints → `docs/requirements/REQ-*.md` |
-| 2 | `/generate-tasks <REQ>` | PRD → struktūruotos užduotys → `docs/tasks/TASK-*.md` |
-| 3a | `/process-tasks <TASK>` | Vykdo VIENĄ sub-task'ą, sustoja patikrinimui |
-| 3b | `/process-tasks-batch <TASK>` | Vykdo VISĄ parent task be sustojimo |
-| 4 | `/status` | Task'ų progresas |
+| 1 | `/create-prd "<aprašymas>"` | PRD su Orchestration Hints. Output: `docs/requirements/REQ-*.md` |
+| 2 | `/generate-tasks <REQ>` | PRD virsta struktūruotomis užduotimis. Output: `docs/tasks/TASK-*.md` |
+| 3a | `/process-tasks <TASK>` | Vykdo vieną sub-užduotį, sustoja patvirtinimui |
+| 3b | `/process-tasks-batch <TASK>` | Vykdo visą pagrindinę užduotį be sustojimo |
+| 4 | `/status` | Užduočių progresas |
 
-**Pavyzdinis flow** (po `setup.sh` paleidimo):
+**Pavyzdinis srautas po `setup.sh` paleidimo:**
 
 ```bash
 claude
@@ -123,26 +123,26 @@ claude
 > /process-tasks docs/tasks/TASK-vartotojo-profilis.md
 ```
 
-CWK guard'ų pavadinimai port'inti į starter'io LT konvenciją (`payment-guardian` → `payment-guard`, etc.). Pilna lentelė: `docs/CWK-AGENT-MAPPING.md`.
+CWK guard'ų pavadinimai port'inti į starter'io LT konvenciją. Pavyzdžiui, `payment-guardian` tampa `payment-guard`. Pilną lentelę rasite `docs/CWK-AGENT-MAPPING.md`.
 
 ## 7 guard agentai
 
 Visi gyvena `.claude/agents/`:
 
-1. `db-migration-guard` — blokuoja destruktyvias migracijas be rollback
-2. `payment-guard` — tikrina idempotency, kainų logiką, Stripe webhooks
-3. `risk-assessor` — priskiria low/medium/high kiekvienam PR
-4. `language-guard` — LT/EN tekstai atitinka konvencijas
-5. `file-size-guard` — failo ≤ 300 LOC, funkcijos ≤ 50 LOC
-6. `test-coverage-guard` — testų coverage ≥ 80% paveiktiems failams
-7. `security-guard` — secret leaks, RLS trūkumai, CSP
+1. `db-migration-guard`. blokuoja destruktyvias migracijas be rollback
+2. `payment-guard`. tikrina idempotency, kainų logiką, Stripe webhooks
+3. `risk-assessor`. priskiria low/medium/high kiekvienam PR
+4. `language-guard`. LT/EN tekstai atitinka konvencijas
+5. `file-size-guard`. failo ≤ 300 LOC, funkcijos ≤ 50 LOC
+6. `test-coverage-guard`. testų coverage ≥ 80% paveiktiems failams
+7. `security-guard`. secret leaks, RLS trūkumai, CSP
 
 ## Licencija
 
-MIT — žr. `LICENSE`.
+MIT. Žr. `LICENSE`.
 
 ## Kredits
 
-- [MemPalace](https://github.com/MemPalace/mempalace) — @MemPalace
-- [Memoriki](https://github.com/AyanbekDos/memoriki) — @AyanbekDos
-- [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) — @forrestchang
+- [MemPalace](https://github.com/MemPalace/mempalace). @MemPalace
+- [Memoriki](https://github.com/AyanbekDos/memoriki). @AyanbekDos
+- [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills). @forrestchang

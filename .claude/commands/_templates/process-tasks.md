@@ -37,7 +37,7 @@ Each parent task has this structure:
    - `file-size-guard` → if splitting a large file
    - `risk-assessor` → if touching critical paths
 
-2. **Skills** — Activate specified skills (e.g., `superpowers:test-driven-development`)
+2. **Skills** — Activate specified skills (e.g., `superpowers:test-driven-development (optional)`)
 
 3. **Research** — Run specified agents and MCP tools:
    - `Explore` agent → find existing patterns

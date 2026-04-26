@@ -13,7 +13,7 @@ Create a detailed Product Requirements Document (PRD) in Markdown format. The PR
 3. **Research:** Use available MCP tools and agents to understand existing code, DB schema, and architecture.
 4. **Generate PRD:** Based on the prompt, answers, and research — generate the PRD.
 5. **Risk Assessment:** Perform mandatory risk assessment (REQUIRED).
-6. **Save PRD:** Save as `prd-[feature-name].md` inside the `/tasks` directory.
+6. **Save PRD:** Save as `REQ-YYYY-MM-DD-NNN-[feature-name].md` (where YYYY-MM-DD is today, NNN is next 3-digit number in docs/requirements/) inside the `docs/requirements/` directory.
 
 ## Clarifying Questions (Examples)
 
@@ -87,8 +87,8 @@ Assume the primary reader is a **senior developer**. Requirements must be explic
 ## Output
 
 - **Format:** Markdown (`.md`)
-- **Location:** `/docs/requirements/`
-- **Filename:** `prd-[feature-name].md`
+- **Location:** `docs/requirements/`
+- **Filename:** `REQ-YYYY-MM-DD-NNN-[feature-name].md` (where YYYY-MM-DD is today, NNN is next 3-digit number in docs/requirements/)
 
 ## MCP Tools Usage
 

@@ -9,7 +9,7 @@ Create a detailed, step-by-step task list in Markdown format based on an existin
 ## Output
 
 - **Format:** Markdown (`.md`)
-- **Location:** `/docs/tasks/`
+- **Location:** `docs/tasks/`
 - **Filename:** `tasks-[prd-file-name].md`
 
 ## Process
@@ -67,7 +67,7 @@ Every parent task MUST have an **Orchestration** block. Sub-tasks must reference
    - `pre-deploy` — before commit
    - `file-size-guard` — splitting large files
    - `risk-assessor` — revenue/critical path changes
-4. **Skills** — Which skills to activate (e.g., `superpowers:test-driven-development`).
+4. **Skills** — Which skills to activate (e.g., `superpowers:test-driven-development (optional)`).
 5. **Verify** — Specific verification steps: build commands, test commands, browser testing.
 
 ### Sub-Task Rules

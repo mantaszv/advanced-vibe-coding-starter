@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Port CWK 4-stage pipeline commands → starter kit's _templates/.
-# VIENKARTINIS skriptas — paleidžiamas mano lokaliai prieš commit'inant
+# VIENKARTINIS skriptas. Paleidžiamas mano lokaliai prieš commit'inant
 # `.claude/commands/_templates/`. Dalyviams jis NESVARBUS.
 #
 # Atlieka 2 transformacijų grupes:
 #   1) Agent name remapping: 5 EN-stiliaus CWK guard'ai → LT-stiliaus starter'io guard'ai
 #   2) Path remapping: /tasks/ → /docs/requirements/ (PRD) arba /docs/tasks/ (TASK)
 #
-# Likusius {{VAR}} placeholderius palieka — juos sub'ina setup.sh stack-aware
+# Likusius {{VAR}} placeholderius palieka. Juos sub'ina setup.sh stack-aware
 # atveju.
 
 set -euo pipefail
@@ -29,7 +29,7 @@ port_file() {
   cp "$src" "$tmp"
 
   # 1. Agent name remapping (4 EN vardai → LT atitikmenys; risk-assessor lieka).
-  # Bash 3.2-suderinama: tiesioginės substitucijos, ne assoc. arrays.
+  # Bash 3.2-suderinama: tiesioginės substitucijos, ne assoc. Arrays.
   sed -i.bak \
     -e 's|payment-guardian|payment-guard|g' \
     -e 's|db-guardian|db-migration-guard|g' \
@@ -38,7 +38,7 @@ port_file() {
     "$tmp"
   rm -f "${tmp}.bak"
 
-  # 2. Path remapping — task file refs PIRMA (siauresnis match), tada PRD refs.
+  # 2. Path remapping. Task file refs PIRMA (siauresnis match), tada PRD refs.
   #    `tasks/tasks-prd-{slug}.md` → `docs/tasks/TASK-{slug}.md`
   sed -i.bak -E 's|tasks/tasks-prd-([a-zA-Z0-9_-]+)\.md|docs/tasks/TASK-\1.md|g' "$tmp"
   rm -f "${tmp}.bak"
@@ -46,19 +46,40 @@ port_file() {
   sed -i.bak -E 's|tasks/prd-([a-zA-Z0-9_-]+)\.md|docs/requirements/REQ-\1.md|g' "$tmp"
   rm -f "${tmp}.bak"
 
-  # 3. Bare "Location: /tasks/" — per-file (create-prd → requirements, generate-tasks → tasks)
+  # 3. Bare path referencijos. Per failą skirtingai (create-prd rašo į requirements, generate-tasks į tasks).
   case "$name" in
     create-prd.md)
-      sed -i.bak 's|Location:\*\* `/tasks/`|Location:** `/docs/requirements/`|g' "$tmp"
-      sed -i.bak 's|Location:\*\* /tasks/|Location:** /docs/requirements/|g' "$tmp"
+      sed -i.bak \
+        -e 's|`/tasks/`|`docs/requirements/`|g' \
+        -e 's|`prd-\[feature-name\]\.md`|`REQ-YYYY-MM-DD-NNN-[feature-name].md` (where YYYY-MM-DD is today, NNN is next 3-digit number in docs/requirements/)|g' \
+        -e 's|inside the `/tasks` directory|inside the `docs/requirements/` directory|g' \
+        -e 's|inside the /tasks directory|inside the docs/requirements/ directory|g' \
+        "$tmp"
       rm -f "${tmp}.bak"
       ;;
     generate-tasks.md)
-      sed -i.bak 's|Location:\*\* `/tasks/`|Location:** `/docs/tasks/`|g' "$tmp"
-      sed -i.bak 's|Location:\*\* /tasks/|Location:** /docs/tasks/|g' "$tmp"
+      sed -i.bak \
+        -e 's|`/tasks/`|`docs/tasks/`|g' \
+        -e 's|`tasks-prd-\[feature-name\]\.md`|`TASK-[feature-name].md`|g' \
+        -e 's|inside the `/tasks` directory|inside the `docs/tasks/` directory|g' \
+        -e 's|inside the /tasks directory|inside the docs/tasks/ directory|g' \
+        "$tmp"
+      rm -f "${tmp}.bak"
+      ;;
+    process-tasks.md|process-tasks-batch.md|status.md)
+      sed -i.bak \
+        -e 's|`/tasks/`|`docs/tasks/`|g' \
+        -e 's|`tasks-\*\.md`|`TASK-*.md`|g' \
+        -e 's|in the `/tasks` directory|in the `docs/tasks/` directory|g' \
+        -e 's|in the /tasks directory|in the docs/tasks/ directory|g' \
+        "$tmp"
       rm -f "${tmp}.bak"
       ;;
   esac
+
+  # 4. Skill referencijos pažymimos kaip optional, kad dalyvis suprastų: jei plugin neįdiegtas, skip.
+  sed -i.bak -E 's|(superpowers:[a-z-]+)|\1 (optional)|g' "$tmp"
+  rm -f "${tmp}.bak"
 
   mv "$tmp" "$dst"
 }
@@ -80,7 +101,7 @@ done
 echo ""
 echo "Validacija:"
 
-# Pipefail išjungiame šiems patikrinimams — grep be match'ų grąžina 1 (ne klaida).
+# Pipefail išjungiame šiems patikrinimams. Grep be match'ų grąžina 1 (ne klaida).
 set +o pipefail
 
 guard_hits=$(grep -rE 'payment-guardian|db-guardian|lang-reviewer|file-splitter' "$DST_DIR" 2>/dev/null || true)
@@ -92,7 +113,7 @@ else
   exit 1
 fi
 
-path_hits=$(grep -rE 'tasks/(prd-|tasks-prd-)' "$DST_DIR" 2>/dev/null || true)
+path_hits=$(grep -rE 'tasks/(prd-|tasks-prd-)|^[^a-zA-Z]/tasks[^a-zA-Z]|`/tasks/`|prd-\[feature-name\]|tasks-prd-\[feature-name\]' "$DST_DIR" 2>/dev/null || true)
 if [ -z "$path_hits" ]; then
   echo "  ✓ Likę CWK path'ai: 0"
 else
