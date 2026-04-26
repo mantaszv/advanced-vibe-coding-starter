@@ -1,0 +1,20 @@
+{
+  "version": "2.0.1",
+  "installed_at": "2026-04-26T07:33:50Z",
+  "project": {
+    "language": "",
+    "framework": "",
+    "database": "",
+    "payments": "",
+    "hosting": "",
+    "test_framework": "",
+    "ui_language": "en"
+  },
+  "config": {
+    "coverage_threshold": 80,
+    "max_file_lines": 400,
+    "build_cmd": "npm run build",
+    "lint_cmd": "npm run lint",
+    "test_cmd": "npm run test:run"
+  }
+}

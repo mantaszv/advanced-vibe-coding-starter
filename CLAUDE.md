@@ -137,3 +137,61 @@ Jei bet kuris žingsnis fail — grįžti atgal, taisai, kartoji.
 ---
 
 **Šis failas = projekto konstitucija. Jei kyla konfliktas tarp šio failo ir ad-hoc prompt'o — šis failas pirmesnis.**
+
+<!-- CWK:START -->
+# CWK Workflow
+
+This project uses [Claude Workflow Kit](https://github.com/ponasObuolys/claude-workflow-kit) for structured development.
+
+## Available Commands
+
+| Command | Purpose |
+|---|---|
+| `/create-prd` | Generate PRD with risk assessment and orchestration hints |
+| `/generate-tasks` | Generate task list from PRD with orchestration blocks |
+| `/process-tasks` | Implement tasks one sub-task at a time (max control) |
+| `/process-tasks-batch` | Batch implement entire main tasks (faster) |
+| `/status` | View current task progress |
+
+## Workflow
+
+Always follow: **PRD → Tasks → Implementation → Verification**
+
+Never skip steps. Every feature starts with `/create-prd`, not with code.
+
+## Guards
+
+Guards run automatically per orchestration blocks in task lists:
+- `pre-deploy` — lint, build, tests before commit
+- `db-guardian` — migration safety (PRE/POST)
+- `payment-guardian` — revenue-critical path protection (PRE)
+- `lang-reviewer` — UI text language verification (POST)
+- `file-splitter` — safe file splitting strategy (PRE)
+- `risk-assessor` — critical path risk analysis (PRE)
+- `dependency-guardian` — vulnerable/outdated dependency check (PRE)
+- `test-quality-guardian` — test meaningfulness and coverage gaps (POST)
+
+## MCP Servers
+
+Configured in `settings.local.json` — use these tools in your workflow:
+
+| Server | Purpose | When to use |
+|---|---|---|
+| `sequential-thinking` | Complex analysis, debugging, architecture decisions | Multi-step reasoning, root cause analysis |
+| `context7` | Library docs, framework patterns, API references | Before using unfamiliar APIs or libraries |
+| `playwright` | Browser E2E testing, visual validation, screenshots | UI testing, form flows, visual regression |
+| `supabase` | DB tables, migrations, SQL, edge functions | Database operations (if Supabase detected) |
+| `stripe` | Products, prices, customers, payment docs | Payment integration (if Stripe detected) |
+
+Vercel MCP (if detected) requires manual setup: `claude mcp add --transport http vercel https://mcp.vercel.com`
+
+## Hooks
+
+Automatic quality checks configured in `settings.local.json`:
+- **PreToolUse (Write|Edit)** — warns when a file exceeds the line limit, suggests running file-splitter agent
+- **Stop** — reminds to run build/test/lint before ending a session with uncommitted changes
+
+## Reference
+
+See `docs/AI-TOOLKIT.md` for the full tool catalog (MCP servers, agents, guards, skills, orchestration patterns).
+<!-- CWK:END -->
