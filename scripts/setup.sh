@@ -129,8 +129,7 @@ configure_project_auto() {
       LINT_CMD="golangci-lint run"
       TEST_CMD="go test ./..."
       ;;
-    *)
-      # Node/TypeScript/Next.js/Vite default
+    node|typescript)
       BUILD_CMD="npm run build"
       LINT_CMD="npm run lint"
       case "$PROJECT_TEST" in
@@ -139,6 +138,26 @@ configure_project_auto() {
         playwright) TEST_CMD="npx playwright test" ;;
         *)          TEST_CMD="npm run test" ;;
       esac
+      ;;
+    "")
+      # Stack neaptiktas (jokio package.json / manage.py / Cargo.toml / go.mod).
+      # Naudojam neutralius placeholder'ius — dalyvis pats sukonfigūruos.
+      # Speciali išimtis: jei egzistuoja `scripts/verify.sh`, jis tampa de facto test komanda.
+      BUILD_CMD="(nesukonfigūruota)"
+      LINT_CMD="(nesukonfigūruota)"
+      if [ -x "scripts/verify.sh" ]; then
+        TEST_CMD="bash scripts/verify.sh"
+      else
+        TEST_CMD="(nesukonfigūruota)"
+      fi
+      warn "Stack'as neaptiktas — komandos paliekamos kaip placeholder'iai. Atnaujinkite .claude/.cwk-config.json arba pridėkite stack žymeklį (package.json / manage.py / Cargo.toml / go.mod)."
+      ;;
+    *)
+      # Žinoma kalba, bet bez specifinio palaikymo (pvz. java, ruby).
+      BUILD_CMD="(nesukonfigūruota: $PROJECT_LANG)"
+      LINT_CMD="(nesukonfigūruota: $PROJECT_LANG)"
+      TEST_CMD="(nesukonfigūruota: $PROJECT_LANG)"
+      warn "Stack'as '$PROJECT_LANG' nepalaikomas auto-konfigūracijoje — atnaujinkite .claude/.cwk-config.json rankomis."
       ;;
   esac
 }
