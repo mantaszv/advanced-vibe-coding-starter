@@ -8,7 +8,7 @@ tech_stack: Next.js 16.2, React 19.2, Tailwind v4, Supabase, Stripe, Vercel
 
 # mini-CRM — B2B SaaS Lean MVP
 
-## 1. Konteksta ir tikslas
+## 1. Kontekstas ir tikslas
 
 Mini-CRM — paprastas, greitas CRM mažoms B2B SaaS sales komandoms (2–10 SDR/AE).
 Pozicionuojame prieš Pipedrive/HubSpot ant **paprastumo + greičio**, ne feature breadth.
@@ -145,7 +145,9 @@ app/[slug]/          sandoriai, kontaktai, imones, uzduotys, nustatymai
 api/                 stripe/webhook, health
 ```
 
-LT URL slug'ai (per `language-guard`); kodas, props, DB — angliškai.
+LT URL slug'ai be diakritikos (`imones`, `uzduotys`) — design choice URL'ams;
+UI breadcrumbs/tabs rodo pilną LT su diakritika ("Įmonės", "Užduotys"). Kodas,
+props, DB kolonėlės — angliškai.
 
 ### 5.1 Render strategija
 
@@ -284,7 +286,7 @@ V2: Sentry, PostHog.
 - **JWT refresh klaida** — po `createWorkspace` jei nesirefresh'ina session,
   user mato tuščią CRM. Mitigacija: integration test'as flow'ui.
 
-## 14. Faze plano santrauka (writing-plans skilliui)
+## 14. Fazės plano santrauka (writing-plans skilliui)
 
 1. **Setup** — repo init, Next.js 16.2 scaffold, Tailwind v4, shadcn/ui, Supabase
    local dev, env vars
