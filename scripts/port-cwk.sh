@@ -26,60 +26,55 @@ port_file() {
   local src="$1" dst="$2" name="$3"
   local tmp
   tmp=$(mktemp)
+  trap 'rm -f "${tmp}.bak" "$tmp"' RETURN
   cp "$src" "$tmp"
 
-  # 1. Agent name remapping (4 EN vardai → LT atitikmenys; risk-assessor lieka).
-  # Bash 3.2-suderinama: tiesioginės substitucijos, ne assoc. arrays.
-  sed -i.bak \
+  # Per-failo file-specific transformacijos. Bare path'ai skirtingi (create-prd rašo
+  # į docs/requirements/, generate-tasks ir process-tasks į docs/tasks/).
+  local -a file_specific=()
+  case "$name" in
+    create-prd.md)
+      file_specific=(
+        -e 's|`/tasks/`|`docs/requirements/`|g'
+        -e 's|`prd-\[feature-name\]\.md`|`REQ-YYYY-MM-DD-NNN-[feature-name].md` (where YYYY-MM-DD is today, NNN is next 3-digit number in docs/requirements/)|g'
+        -e 's|inside the `/tasks` directory|inside the `docs/requirements/` directory|g'
+        -e 's|inside the /tasks directory|inside the docs/requirements/ directory|g'
+      )
+      ;;
+    generate-tasks.md)
+      file_specific=(
+        -e 's|`/tasks/`|`docs/tasks/`|g'
+        -e 's|`tasks-prd-\[feature-name\]\.md`|`TASK-[feature-name].md`|g'
+        -e 's|inside the `/tasks` directory|inside the `docs/tasks/` directory|g'
+        -e 's|inside the /tasks directory|inside the docs/tasks/ directory|g'
+      )
+      ;;
+    process-tasks.md|process-tasks-batch.md|status.md)
+      file_specific=(
+        -e 's|`/tasks/`|`docs/tasks/`|g'
+        -e 's|`tasks-\*\.md`|`TASK-*.md`|g'
+        -e 's|in the `/tasks` directory|in the `docs/tasks/` directory|g'
+        -e 's|in the /tasks directory|in the docs/tasks/ directory|g'
+      )
+      ;;
+  esac
+
+  # Vienas sed iškvietimas, kuris atlieka VISAS transformacijas:
+  #   1. Agent name remapping (4 EN vardai → LT atitikmenys, risk-assessor lieka).
+  #   2. Task file refs (siauresnis match pirma, tada PRD refs).
+  #   3. File-specific bare path'ai (priklauso nuo komandos failo).
+  #   4. Skill referencijos pažymėtos `(optional)`.
+  # 4 skirtingos sed iteracijos sumažintos iki 1.
+  sed -i.bak -E \
     -e 's|payment-guardian|payment-guard|g' \
     -e 's|db-guardian|db-migration-guard|g' \
     -e 's|lang-reviewer|language-guard|g' \
     -e 's|file-splitter|file-size-guard|g' \
+    -e 's|tasks/tasks-prd-([a-zA-Z0-9_-]+)\.md|docs/tasks/TASK-\1.md|g' \
+    -e 's|tasks/prd-([a-zA-Z0-9_-]+)\.md|docs/requirements/REQ-\1.md|g' \
+    "${file_specific[@]}" \
+    -e 's|(superpowers:[a-z-]+)|\1 (optional)|g' \
     "$tmp"
-  rm -f "${tmp}.bak"
-
-  # 2. Path remapping. Task file refs PIRMA (siauresnis match), tada PRD refs.
-  #    `tasks/tasks-prd-{slug}.md` → `docs/tasks/TASK-{slug}.md`
-  sed -i.bak -E 's|tasks/tasks-prd-([a-zA-Z0-9_-]+)\.md|docs/tasks/TASK-\1.md|g' "$tmp"
-  rm -f "${tmp}.bak"
-  #    `tasks/prd-{slug}.md` → `docs/requirements/REQ-{slug}.md`
-  sed -i.bak -E 's|tasks/prd-([a-zA-Z0-9_-]+)\.md|docs/requirements/REQ-\1.md|g' "$tmp"
-  rm -f "${tmp}.bak"
-
-  # 3. Bare path referencijos. Per failą skirtingai (create-prd rašo į requirements, generate-tasks į tasks).
-  case "$name" in
-    create-prd.md)
-      sed -i.bak \
-        -e 's|`/tasks/`|`docs/requirements/`|g' \
-        -e 's|`prd-\[feature-name\]\.md`|`REQ-YYYY-MM-DD-NNN-[feature-name].md` (where YYYY-MM-DD is today, NNN is next 3-digit number in docs/requirements/)|g' \
-        -e 's|inside the `/tasks` directory|inside the `docs/requirements/` directory|g' \
-        -e 's|inside the /tasks directory|inside the docs/requirements/ directory|g' \
-        "$tmp"
-      rm -f "${tmp}.bak"
-      ;;
-    generate-tasks.md)
-      sed -i.bak \
-        -e 's|`/tasks/`|`docs/tasks/`|g' \
-        -e 's|`tasks-prd-\[feature-name\]\.md`|`TASK-[feature-name].md`|g' \
-        -e 's|inside the `/tasks` directory|inside the `docs/tasks/` directory|g' \
-        -e 's|inside the /tasks directory|inside the docs/tasks/ directory|g' \
-        "$tmp"
-      rm -f "${tmp}.bak"
-      ;;
-    process-tasks.md|process-tasks-batch.md|status.md)
-      sed -i.bak \
-        -e 's|`/tasks/`|`docs/tasks/`|g' \
-        -e 's|`tasks-\*\.md`|`TASK-*.md`|g' \
-        -e 's|in the `/tasks` directory|in the `docs/tasks/` directory|g' \
-        -e 's|in the /tasks directory|in the docs/tasks/ directory|g' \
-        "$tmp"
-      rm -f "${tmp}.bak"
-      ;;
-  esac
-
-  # 4. Skill referencijos pažymimos kaip optional, kad dalyvis suprastų: jei plugin neįdiegtas, skip.
-  sed -i.bak -E 's|(superpowers:[a-z-]+)|\1 (optional)|g' "$tmp"
-  rm -f "${tmp}.bak"
 
   mv "$tmp" "$dst"
 }

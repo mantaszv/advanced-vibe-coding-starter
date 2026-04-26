@@ -79,22 +79,6 @@ Kai naudotojas prašo "atnaujink wiki" arba sesijos pabaigoje:
 1. `mempalace mine .`. reindeksuoti naują turinį
 2. `wiki/log.md` → pridedamas įrašas: kas buvo ingestuota, ką sužinojo
 
-### 3.5 CWK 4 etapų pipeline (v3.0.1)
-
-Šis starter kit integruoja [CWK](https://github.com/ponasObuolys/claude-workflow-kit) feature kūrimo pipeline su keturiais etapais. Komandos pasiekiamos kataloge `.claude/commands/`. Jas sugeneruoja `setup.sh` iš `_templates/`, pakeisdamas placeholderius pagal aptiktą stack'ą.
-
-| Komanda | Paskirtis | Output |
-|---|---|---|
-| `/create-prd "<aprašymas>"` | Sugeneruoja PRD su Orchestration Hints ir Risk Assessment skiltimis | `docs/requirements/REQ-YYYY-MM-DD-NNN-{slug}.md` |
-| `/generate-tasks <REQ-failas>` | Iš PRD sukuria užduotis su pagrindinėmis bei sub-užduotimis ir Orchestration blokais | `docs/tasks/TASK-{slug}.md` |
-| `/process-tasks <TASK-failas>` | Vykdo vieną sub-užduotį ir sustoja patvirtinimui | užduočių progresas faile |
-| `/process-tasks-batch <TASK-failas>` | Vykdo visą pagrindinę užduotį be sustojimo | užduočių progresas faile |
-| `/status` | Rodo užduočių progresą | stdout |
-
-**Guard'ų atitikmenys.** CWK pipeline kviečia guard'us pagal LT vardus iš `.claude/agents/`, ne CWK originalius EN vardus. Pilną lentelę rasite `docs/CWK-AGENT-MAPPING.md`.
-
-**Konfigūracija.** `.claude/.cwk-config.json` (auto-generated) saugo aptiktą stack'ą ir komandų default'us (`build_cmd`, `lint_cmd`, `test_cmd`). Pakartotinis `setup.sh` paleidimas atnaujina šį failą pagal naujausią stack'ą.
-
 ### 3.4 Lint (kai naudotojas prašo "patikrink wiki" arba "wiki health check")
 1. Surasti **kontradikcijas** tarp puslapių (vienas šaltinis sako X, kitas non-X). žymėti `wiki/synthesis/conflicts.md`
 2. Identifikuoti **orphan puslapius**. neturi nė vienos įeinančios `[[wiki-link]]` nuorodos
@@ -116,6 +100,22 @@ updated: 2026-04-25
 ```
 
 **Atvaizdai:** įmesti į `raw/assets/` (LLM nemodifikuoja). Wiki puslapiuose nuorodos relatyvios: `![](../../raw/assets/diagram.png)`.
+
+### 3.5 CWK 4 etapų pipeline (v3.0.1)
+
+Šis starter kit integruoja [CWK](https://github.com/ponasObuolys/claude-workflow-kit) feature kūrimo pipeline su keturiais etapais. Komandos pasiekiamos kataloge `.claude/commands/`. Jas sugeneruoja `setup.sh` iš `_templates/`, pakeisdamas placeholderius pagal aptiktą stack'ą.
+
+| Komanda | Paskirtis | Output |
+|---|---|---|
+| `/create-prd "<aprašymas>"` | Sugeneruoja PRD su Orchestration Hints ir Risk Assessment skiltimis | `docs/requirements/REQ-YYYY-MM-DD-NNN-{slug}.md` |
+| `/generate-tasks <REQ-failas>` | Iš PRD sukuria užduotis su pagrindinėmis bei sub-užduotimis ir Orchestration blokais | `docs/tasks/TASK-{slug}.md` |
+| `/process-tasks <TASK-failas>` | Vykdo vieną sub-užduotį ir sustoja patvirtinimui | užduočių progresas faile |
+| `/process-tasks-batch <TASK-failas>` | Vykdo visą pagrindinę užduotį be sustojimo | užduočių progresas faile |
+| `/status` | Rodo užduočių progresą | stdout |
+
+**Guard'ų atitikmenys.** CWK pipeline kviečia guard'us pagal LT vardus iš `.claude/agents/`, ne CWK originalius EN vardus. Pilną lentelę rasite `docs/CWK-AGENT-MAPPING.md`.
+
+**Konfigūracija.** `.claude/.cwk-config.json` (auto-generated) saugo aptiktą stack'ą ir komandų default'us (`build_cmd`, `lint_cmd`, `test_cmd`). Pakartotinis `setup.sh` paleidimas atnaujina šį failą pagal naujausią stack'ą.
 
 ---
 

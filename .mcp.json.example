@@ -1,5 +1,5 @@
 {
-  "_comment": "Nukopijuokite į .mcp.json (jis .gitignore'e) ir paleiskite `chmod 600 .mcp.json`. Raw raktų ČIA NERAŠOME — naudokite ${VAR} substituciją, o env var'us pildykite iš OS keychain (žr. dalyviams_su_paaiskinimu.txt §0.5 ir §4.2).",
+  "_comment": "Nukopijuokite į .mcp.json (jis .gitignore'e) ir paleiskite `chmod 600 .mcp.json`. Raw raktų ČIA NERAŠOME, naudokite ${VAR} substituciją, o env var'us pildykite iš OS keychain (macOS: Keychain Access, Linux: secret-tool, Windows: Credential Manager).",
   "mcpServers": {
     "supabase": {
       "command": "npx",

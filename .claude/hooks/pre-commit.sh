@@ -26,7 +26,7 @@ trigger_pattern() {
     db-migration-guard)   echo "^supabase/migrations/" ;;
     payment-guard)        echo "stripe|checkout|payment|refund" ;;
     language-guard)       echo "\\.(tsx|ts|md)$" ;;
-    file-size-guard)      echo "^src/" ;;
+    file-size-guard)      echo "\\.(sh|ts|tsx|js|jsx|py|rs|go|md|yml|yaml)$" ;;
     test-coverage-guard)  echo "^src/.*\\.(ts|tsx)$" ;;
     security-guard)       echo "\\.env|supabase/|auth|middleware" ;;
   esac
