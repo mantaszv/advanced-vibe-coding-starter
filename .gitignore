@@ -59,3 +59,9 @@ test-results/
 # MemPalace per-project files (issue #185)
 mempalace.yaml
 entities.json
+
+# CWK pipeline runtime artifacts (generuojami iš _templates/ per setup.sh)
+.claude/commands/*.md
+!.claude/commands/_templates/
+.claude/.cwk-config.json
+.mcp.json.suggested

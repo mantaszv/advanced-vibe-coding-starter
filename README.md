@@ -1,4 +1,4 @@
-# Advanced Vibe Coding Starter
+# Advanced Vibe Coding Starter v3.0.1
 
 Seminaro **Advanced Vibe Coding · 2026-04-25/26** starter projektas.
 
@@ -44,11 +44,11 @@ claude
 
 ## Ką `scripts/setup.sh` padaro
 
-1. `pip install mempalace` — įdiegia MemPalace
-2. `mempalace init .` — sukuria `.mempalace/` indeksą šiame projekte
-3. `claude mcp add mempalace` — prijungia MemPalace MCP serverį prie Claude Code
-4. Nustato `.claude/hooks/pre-commit.sh` kaip vykdomąjį
-5. Paleidžia pradinį `mempalace mine .` (jei `raw/` nėra tuščias)
+1. **Įdiegia MemPalace** per `pipx install mempalace` (fallback: `brew install pipx` → pipx, paskutinis atvejis — vietinis `.venv/`).
+2. **Inicializuoja palace projekte** — `mempalace init . --yes` sukuria `mempalace.yaml` ir `entities.json` projekto šaknyje. Pati saugykla gyvena `~/.mempalace/` (globali, dalinama tarp visų jūsų projektų — kiekvienas projektas turi savo *wing*).
+3. **Prijungia MCP serverį** — aptinka python interpretatorių, kuris turi `mempalace` modulį (svarbu macOS pipx atveju, kur sistemos `python` jo neturi), ir registruoja: `claude mcp add mempalace -- <python> -m mempalace.mcp_server`.
+4. **Nustato pre-commit hook** — `.claude/hooks/pre-commit.sh` +x, susieja su `.git/hooks/pre-commit`.
+5. **Pradinis mine** — jei `raw/` turi failų, paleidžia `mempalace mine .` (idempotentinis).
 
 ## Struktūra
 
@@ -101,6 +101,29 @@ Pilna metodika: žr. `ADVANCED-VIBE-CODING-Meistrystes-Vadovas.md`.
 | 6 | **Chrome DevTools** | DOM inspekcija Self-Healing metu |
 
 Plius **MemPalace** (7-as, iš `mempalace init`).
+
+## 5 slash komandos (CWK 4-stage pipeline, v3.0.1)
+
+`scripts/setup.sh` aptinka jūsų stack'ą (Node.js/TypeScript, Next.js/Vite-React, Python, Django, Rust, Go) ir generuoja `.claude/commands/*.md` su stack-specific komandų default'ais (`build_cmd`, `lint_cmd`, `test_cmd`):
+
+| # | Komanda | Paskirtis |
+|---|---|---|
+| 1 | `/create-prd "<aprašymas>"` | PRD su Orchestration Hints → `docs/requirements/REQ-*.md` |
+| 2 | `/generate-tasks <REQ>` | PRD → struktūruotos užduotys → `docs/tasks/TASK-*.md` |
+| 3a | `/process-tasks <TASK>` | Vykdo VIENĄ sub-task'ą, sustoja patikrinimui |
+| 3b | `/process-tasks-batch <TASK>` | Vykdo VISĄ parent task be sustojimo |
+| 4 | `/status` | Task'ų progresas |
+
+**Pavyzdinis flow** (po `setup.sh` paleidimo):
+
+```bash
+claude
+> /create-prd "Pridėk vartotojo profilio puslapį"
+> /generate-tasks docs/requirements/REQ-2026-04-26-001-*.md
+> /process-tasks docs/tasks/TASK-vartotojo-profilis.md
+```
+
+CWK guard'ų pavadinimai port'inti į starter'io LT konvenciją (`payment-guardian` → `payment-guard`, etc.). Pilna lentelė: `docs/CWK-AGENT-MAPPING.md`.
 
 ## 7 guard agentai
 

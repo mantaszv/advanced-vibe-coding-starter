@@ -1,6 +1,8 @@
-# CLAUDE.md — Projekto Smegenys
+# CLAUDE.md — Projekto Smegenys (v3.0.1)
 
 Šis failas yra PIRMAS dalykas, kurį Claude Code skaito prieš kiekvieną užduotį.
+
+> **v3.0.1 naujovė:** Integruota CWK 4-stage pipeline (`/create-prd`, `/generate-tasks`, `/process-tasks`, `/process-tasks-batch`) + multi-stack auto-detection (Node/Python/Django/Rust/Go). Žr. §3.5.
 
 ---
 
@@ -77,15 +79,43 @@ Kai naudotojas prašo "atnaujink wiki" arba sesijos pabaigoje:
 1. `mempalace mine .` — reindeksuoti naują turinį
 2. `wiki/log.md` → pridedamas įrašas: kas buvo ingestuota, ką sužinojo
 
-**Wiki frontmatter privalomas:**
+### 3.5 CWK 4-Stage Pipeline (v3.0.1)
+
+Šis starter kit integruoja [CWK](https://github.com/ponasObuolys/claude-workflow-kit) 4-stage feature development pipeline. Komandos pasiekiamos `.claude/commands/` (generuojamos iš `_templates/` per `setup.sh` su stack-specific substitucija):
+
+| Komanda | Paskirtis | Output |
+|---|---|---|
+| `/create-prd "<aprašymas>"` | Sugeneruoja PRD su Orchestration Hints + Risk Assessment | `docs/requirements/REQ-YYYY-MM-DD-NNN-{slug}.md` |
+| `/generate-tasks <REQ-failas>` | PRD → tasks su parent + sub-tasks + Orchestration blokais | `docs/tasks/TASK-{slug}.md` |
+| `/process-tasks <TASK-failas>` | Vykdo VIENĄ sub-task, sustoja pasitarimui | task progress mark |
+| `/process-tasks-batch <TASK-failas>` | Vykdo VISĄ parent task'ą be sustojimo | task progress mark |
+| `/status` | Rodo task'ų progresą | stdout |
+
+**Guard mapping:** CWK pipeline metu cituojami guard'ai naudoja LT-stiliaus pavadinimus iš `.claude/agents/` (NE CWK EN-stiliaus). Pilna mapping lentelė: `docs/CWK-AGENT-MAPPING.md`.
+
+**Konfigūracija:** `.claude/.cwk-config.json` (auto-generated) saugo aptiktą stack'ą + komandų default'us (`build_cmd`, `lint_cmd`, `test_cmd`). Re-run `setup.sh` perdaro su naujausia stack info.
+
+### 3.4 Lint (kai naudotojas prašo "patikrink wiki" arba "wiki health check")
+1. Surasti **kontradikcijas** tarp puslapių (vienas šaltinis sako X, kitas non-X) — žymėti `wiki/synthesis/conflicts.md`
+2. Identifikuoti **orphan puslapius** — neturi nė vienos įeinančios `[[wiki-link]]` nuorodos
+3. Rasti **concepts paminėtus tekste, bet neturinčius savo puslapio** → kandidatai į `wiki/concepts/`
+4. Patikrinti **stale informaciją** (frontmatter `updated` > 90 dienų ir tema sparčiai keičiasi)
+5. Pasiūlyti **naujus šaltinius**, kurie užpildytų žinių spragas
+6. Įrašyti lint pass į `wiki/log.md`
+
+**Wiki frontmatter privalomas** (atitinka upstream Memoriki spec — leidžia Obsidian-style backlinks):
 ```yaml
 ---
+title: Page Title
 type: entity | concept | source | synthesis
+sources: [raw/paper-001.md]
+related: [[wiki/concepts/foo]], [[wiki/entities/bar]]
 created: 2026-04-25
 updated: 2026-04-25
-sources: [raw/paper-001.md]
 ---
 ```
+
+**Atvaizdai:** įmesti į `raw/assets/` (LLM nemodifikuoja). Wiki puslapiuose nuorodos relatyvios: `![](../../raw/assets/diagram.png)`.
 
 ---
 

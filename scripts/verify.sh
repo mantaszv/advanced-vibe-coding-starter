@@ -49,6 +49,16 @@ check "mempalace.yaml egzistuoja"          "test -f mempalace.yaml"
 check "MemPalace MCP prijungtas"           "claude mcp list 2>/dev/null | grep -q mempalace"
 
 echo ""
+echo "━━━ CWK pipeline (v3.0.1) ━━━"
+check "_templates/ turi 5 komandas"        "test \$(ls .claude/commands/_templates/*.md 2>/dev/null | wc -l) -ge 5"
+check "Sugeneruotos 5 .claude/commands/"   "test \$(ls .claude/commands/*.md 2>/dev/null | wc -l) -ge 5"
+check ".cwk-config.json egzistuoja"        "test -f .claude/.cwk-config.json"
+check "version == 3.0.1"                   "test \"\$(jq -r .version .claude/.cwk-config.json 2>/dev/null)\" = 3.0.1"
+check "Stop hook'as settings.json'e"       "jq -e '.hooks.Stop' .claude/settings.json"
+check "scripts/port-cwk.sh egzistuoja"     "test -x scripts/port-cwk.sh"
+check "docs/CWK-AGENT-MAPPING.md"          "test -f docs/CWK-AGENT-MAPPING.md"
+
+echo ""
 echo "━━━ Saugumas ━━━"
 check ".mcp.json NĖRA git tracking'e"      "! git ls-files --error-unmatch .mcp.json 2>/dev/null"
 check ".env NĖRA git tracking'e"           "! git ls-files --error-unmatch .env 2>/dev/null"
@@ -59,7 +69,10 @@ printf "Praėjo: \033[1;32m%d\033[0m | Nepraėjo: \033[1;31m%d\033[0m\n" "$PASS"
 
 if [ "$FAIL" -gt 0 ]; then
   echo ""
-  echo "Jei MCP nepraejo — paleiskite: claude mcp add mempalace -- mempalace serve --stdio"
-  echo "Jei MemPalace — python3 -m pip install --user mempalace"
+  echo "Jei kuris nors patikrinimas nepraėjo — paleiskite: bash scripts/setup.sh"
+  echo "(setup.sh idempotentinis: aptinka tinkamą python interpretatorių, perinit'ina partial state'us"
+  echo " ir užregistruoja MemPalace MCP. Saugu paleisti pakartotinai.)"
+  echo ""
+  echo "Jei MemPalace iš viso neįdiegtas — rankiniu būdu: pipx install mempalace"
   exit 1
 fi
