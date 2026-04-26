@@ -319,7 +319,7 @@ if [ -n "$MEMPALACE_PY" ]; then
   # Pašalinti seną sulūžusią registraciją (jei dalyvis paleido senesnę setup.sh versiją)
   EXISTING_CMD=$(claude mcp get mempalace 2>/dev/null | awk '/^  Command:/ {print $2}' || true)
   if [ -n "$EXISTING_CMD" ] && [ "$EXISTING_CMD" != "$MEMPALACE_PY" ]; then
-    warn "Aptikta sena MemPalace MCP registracija ($EXISTING_CMD). perregistruojama"
+    warn "Aptikta sena MemPalace MCP registracija ($EXISTING_CMD), perregistruojama"
     claude mcp remove mempalace -s local >/dev/null 2>&1 || true
   fi
 

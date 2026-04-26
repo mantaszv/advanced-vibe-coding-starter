@@ -29,7 +29,7 @@ port_file() {
   cp "$src" "$tmp"
 
   # 1. Agent name remapping (4 EN vardai → LT atitikmenys; risk-assessor lieka).
-  # Bash 3.2-suderinama: tiesioginės substitucijos, ne assoc. Arrays.
+  # Bash 3.2-suderinama: tiesioginės substitucijos, ne assoc. arrays.
   sed -i.bak \
     -e 's|payment-guardian|payment-guard|g' \
     -e 's|db-guardian|db-migration-guard|g' \

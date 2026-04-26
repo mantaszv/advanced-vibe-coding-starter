@@ -139,7 +139,7 @@ Visi gyvena `.claude/agents/`:
 
 ## Licencija
 
-MIT. Žr. `LICENSE`.
+MIT licencija. Detalės: `LICENSE`.
 
 ## Kredits
 
