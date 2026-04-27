@@ -35,7 +35,7 @@
 
 ### Recommended: A
 
-**Pagrindimas:** MVP fazėje. Pereisime prie B, kai apimtis > 100 refund/dieną. Kol kas — A + Stripe SDK retry built-in.
+**Pagrindimas:** šiame etape renkamės paprastesnį sprendimą. Pereisime prie B, kai apimtis > 100 refund/dieną. Kol kas — A + Stripe SDK retry built-in.
 
 ## Risk assessment
 

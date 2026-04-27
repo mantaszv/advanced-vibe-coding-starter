@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "mini-CRM",
-  description: "Lengvas CRM lietuviškoms paslaugų SMĮ",
+  title: "Advanced Vibe Coding Starter",
+  description:
+    "Patikrintas Next.js 16.2+ ir React 19 starter kit su CI, testais ir AI powerpack",
 };
 
 export default function RootLayout({

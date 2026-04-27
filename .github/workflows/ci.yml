@@ -50,7 +50,19 @@ jobs:
       - run: npm ci
       - run: npm run test:run
 
-  # E2E (Playwright) — įjungiamas, kai TASK-04 (login) ir TASK-11 (kontaktai) baigti.
+  build:
+    name: Build (next)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  # E2E (Playwright) — įjungiamas, kai projekte atsiranda stabilūs kritiniai vartotojo srautai.
   # Tada pakeisti `if: false` → `if: true` ir pridėti `tests/e2e/smoke.spec.ts`.
   e2e:
     name: E2E (Playwright smoke)
