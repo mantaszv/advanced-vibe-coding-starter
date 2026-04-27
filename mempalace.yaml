@@ -1,0 +1,30 @@
+wing: advanced_vibe_coding_starter
+rooms:
+- name: documentation
+  description: Files from wiki/
+  keywords:
+  - documentation
+  - wiki
+- name: scripts
+  description: Files from scripts/
+  keywords:
+  - scripts
+  - scripts
+- name: raw
+  description: Files from raw/
+  keywords:
+  - raw
+  - raw
+- name: planning
+  description: Files from requirements/
+  keywords:
+  - planning
+  - requirements
+- name: design
+  description: Files from assets/
+  keywords:
+  - design
+  - assets
+- name: general
+  description: Files that don't fit other rooms
+  keywords: []

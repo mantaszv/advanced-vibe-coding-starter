@@ -28,17 +28,13 @@ Papildomai pridėti: 7 guard agentai, 4-fazių pipeline šablonai, Self-Healing 
 git clone <šio repo URL> my-project
 cd my-project
 
-# 2. Paleiskite automatinį setup
+# 2. Paleiskite automatinį setup (interaktyviai paklaus dėl MCP raktų)
 bash scripts/setup.sh
 
 # 3. Patikrinkite, kad viskas veikia
 bash scripts/verify.sh
 
-# 4. Nukopijuokite MCP šabloną ir įrašykite savo raktus
-cp .mcp.json.example .mcp.json
-$EDITOR .mcp.json
-
-# 5. Paleiskite Claude Code
+# 4. Paleiskite Claude Code
 claude
 ```
 
@@ -46,9 +42,11 @@ claude
 
 1. **Įdiegia MemPalace** per `pipx install mempalace`. Atsarginiai variantai. `brew install pipx`, jei pipx dar nėra, arba vietinis `.venv/`, jei nei pipx, nei brew.
 2. **Inicializuoja palace projekte.** `mempalace init . --yes` sukuria `mempalace.yaml` ir `entities.json` projekto šaknyje. Pati saugykla gyvena `~/.mempalace/`. Tai globali vieta, dalinama tarp visų jūsų projektų. Kiekvienas projektas joje turi savo *wing*.
-3. **Prijungia MCP serverį.** Aptinka python interpretatorių, kuris turi `mempalace` modulį. Tai svarbu macOS pipx atveju, kur sistemos `python` modulio neturi. Užregistruoja: `claude mcp add mempalace -- <python> -m mempalace.mcp_server`.
-4. **Nustato pre-commit hook'ą.** `.claude/hooks/pre-commit.sh` +x, susieja su `.git/hooks/pre-commit`.
-5. **Pradinis mine.** Jei `raw/` turi failų, paleidžia `mempalace mine .`. Komanda idempotentinė.
+3. **Prijungia MemPalace MCP serverį.** Aptinka python interpretatorių, kuris turi `mempalace` modulį. Tai svarbu macOS pipx atveju, kur sistemos `python` modulio neturi. Užregistruoja: `claude mcp add mempalace -- <python> -m mempalace.mcp_server`.
+4. **Aptinka stack'ą + sukonfigūruoja CWK pipeline.** Iš `package.json`/`manage.py`/`Cargo.toml`/`go.mod` aptinka kalbą bei framework'ą, sugeneruoja `.claude/commands/*.md` slash komandas su tinkamais `build_cmd`/`lint_cmd`/`test_cmd` default'ais.
+5. **Nustato pre-commit hook'ą.** `.claude/hooks/pre-commit.sh` +x, susieja su `.git/hooks/pre-commit`.
+6. **Interaktyviai konfigūruoja MCP serverius.** Klausia per kiekvieną iš 6 MCP (Supabase, Context7, Stripe, Playwright, Vercel, Chrome DevTools) ar įtraukti. Default'ai parenkami pagal aptiktą stack'ą (Supabase Y jei `@supabase/supabase-js` rastas, Stripe Y jei `stripe` rastas, ir t.t.). Surenka API tokenus (slaptas įvedimas su `read -s`), įrašo tiesiogiai į `.mcp.json` su `chmod 600`. Failas yra `.gitignore`'e. Paleidus pakartotinai — klausia, ar perrašyti (default N), egzistuojantis `.mcp.json` backup'inamas. Praleisti tokeną Enter'iu = liks `${VAR}` placeholder'is.
+7. **Pradinis mine.** Jei `raw/` turi failų, paleidžia `mempalace mine .`. Komanda idempotentinė.
 
 ## Struktūra
 

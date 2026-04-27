@@ -26,6 +26,8 @@ err()   { printf "\033[1;31m[ERR ]\033[0m %s\n" "$*" >&2; exit 1; }
 source "$ROOT/scripts/lib/detect.sh"
 # shellcheck disable=SC1091
 source "$ROOT/scripts/lib/cwk-pipeline.sh"
+# shellcheck disable=SC1091
+source "$ROOT/scripts/lib/mcp-config.sh"
 
 # --- 1. Reikalavimų patikra ---
 info "Tikrinama Python 3.9+..."
@@ -148,9 +150,11 @@ if [ -d ".git" ]; then
   fi
 fi
 
-# --- 8. MCP konfigūracijos priminimas ---
-if [ ! -f ".mcp.json" ]; then
-  warn "Nepamirškite: cp .mcp.json.example .mcp.json ir įrašykite savo raktus"
+# --- 8. MCP serverių konfigūracija (interaktyvi) ---
+if ! mcp_config_interactive; then
+  if [ ! -f ".mcp.json" ]; then
+    warn "Interaktyvi konfigūracija praleista. Rankinis būdas: cp .mcp.json.example .mcp.json && \$EDITOR .mcp.json"
+  fi
 fi
 
 # --- 9. Pradinis mine (jei raw/ nėra tuščias) ---
@@ -161,6 +165,9 @@ fi
 
 printf "\n\033[1;32m━━━ SETUP BAIGTAS ━━━\033[0m\n"
 echo "Kiti žingsniai:"
-echo "  1. cp .mcp.json.example .mcp.json && \$EDITOR .mcp.json"
-echo "  2. bash scripts/verify.sh"
-echo "  3. claude  # paleiskite Claude Code"
+echo "  1. bash scripts/verify.sh    # sanity check"
+echo "  2. claude                    # paleiskite Claude Code"
+if [ -f .mcp.json ]; then
+  echo ""
+  echo "MCP redagavimas vėliau: \$EDITOR .mcp.json (chmod 600, .gitignore'e)"
+fi
