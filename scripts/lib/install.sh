@@ -10,15 +10,18 @@
 # išsaugomi kaip ${file}.starter, kad dalyvis galėtų sumerge'inti rankomis.
 
 # Kopijuoja katalogo turinį be esamų failų perrašymo.
-# `cp -n` nekopijuoja, jei taikinys jau egzistuoja (per-failą, ne per-katalogą).
+# Naudoja rsync, nes BSD `cp -Rn` (macOS) grąžina exit 1 kai praleidžia esamą failą,
+# o tai su `set -e` tyliai užmuša skriptą. rsync --ignore-existing turi tą patį elgesį,
+# bet teisingai signalizuoja success.
 _install_dir_safe() {
   local src="$1" dst="$2"
   [ -d "$src" ] || return 0
-  if [ -d "$dst" ]; then
-    cp -Rn "$src/." "$dst/"
-  else
+  if [ ! -d "$dst" ]; then
     cp -R "$src" "$dst"
+    return 0
   fi
+  command -v rsync >/dev/null || err "rsync nerastas (reikalingas saugiam katalogo merge'inimui)"
+  rsync -a --ignore-existing "$src/" "$dst/"
 }
 
 # Įterpia starter failo turinį į target failą tarp marker'ių.
