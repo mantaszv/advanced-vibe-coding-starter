@@ -2,15 +2,48 @@
 # Advanced Vibe Coding Starter. Setup script.
 # Paleidžia viską, ko reikia, kad dalyvis per 5 min turėtų veikiančią aplinką.
 #
+# Naudojimas:
+#   bash scripts/setup.sh                     # konfigūruoja patį starter projektą
+#   bash scripts/setup.sh /path/to/project    # įdiegia starter į egzistuojantį projektą
+#   bash scripts/setup.sh --help
+#
 # Architektūra:
 #   - scripts/lib/detect.sh        — stack aptikimas, komandų default'ai, python detect
 #   - scripts/lib/cwk-pipeline.sh  — CWK §5 (template substitucija, jq merge'ai)
+#   - scripts/lib/mcp-config.sh    — interaktyvi MCP konfigūracija
+#   - scripts/lib/install.sh       — starter diegimas į target projektą
 #   - scripts/setup.sh             — orkestracija (šis failas)
 
 set -euo pipefail
 
+# --- 0. Argumentų parsavimas ---
+if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
+  cat <<'EOF'
+Usage: bash scripts/setup.sh [TARGET_DIR]
+
+Be argumentų  : konfigūruoja patį starter projektą.
+Su TARGET_DIR : įdiegia starter scaffolding į egzistuojantį projektą,
+                tada paleidžia konfigūraciją jame.
+
+Įdiegiama (esami target failai NEPERRAŠOMI; konfliktai → *.starter):
+  .claude/                  agentai, hooks, komandos, _templates, settings
+  scripts/                  setup.sh, verify.sh, lib/*
+  .mcp.json.example         MCP serverių template
+  CLAUDE.md                 jei target neturi (kitaip CLAUDE.md.starter)
+  .gitignore                jei target neturi (kitaip .gitignore.starter)
+  raw/, wiki/               skeleton (jei nėra)
+  docs/{requirements,tasks} skeleton (jei nėra)
+
+Nekopijuojama: app kodas, package.json, build configai, node_modules, .git.
+EOF
+  exit 0
+fi
+
+TARGET_DIR_ARG="${1:-}"
+
 cd "$(dirname "$0")/.."
-ROOT=$(pwd)
+STARTER_ROOT=$(pwd)
+ROOT="$STARTER_ROOT"
 
 # Single source of truth versijai. Skaitoma vienoje vietoje, naudojama .cwk-config.json,
 # CLAUDE.md ir README.md (per template substituciją, žr. cwk-pipeline.sh).
@@ -21,13 +54,26 @@ ok()    { printf "\033[1;32m[ OK ]\033[0m %s\n" "$*"; }
 warn()  { printf "\033[1;33m[WARN]\033[0m %s\n" "$*"; }
 err()   { printf "\033[1;31m[ERR ]\033[0m %s\n" "$*" >&2; exit 1; }
 
-# Lib funkcijos.
+# Lib funkcijos. Source'inama iš STARTER_ROOT, kad veiktų ir po cd į target.
 # shellcheck disable=SC1091
-source "$ROOT/scripts/lib/detect.sh"
+source "$STARTER_ROOT/scripts/lib/detect.sh"
 # shellcheck disable=SC1091
-source "$ROOT/scripts/lib/cwk-pipeline.sh"
+source "$STARTER_ROOT/scripts/lib/cwk-pipeline.sh"
 # shellcheck disable=SC1091
-source "$ROOT/scripts/lib/mcp-config.sh"
+source "$STARTER_ROOT/scripts/lib/mcp-config.sh"
+# shellcheck disable=SC1091
+source "$STARTER_ROOT/scripts/lib/install.sh"
+
+# --- 0.1 Install mode: kopijuojam scaffolding į target, tada cd į target. ---
+if [ -n "$TARGET_DIR_ARG" ]; then
+  [ -d "$TARGET_DIR_ARG" ] || err "TARGET_DIR nėra direktorija: $TARGET_DIR_ARG"
+  TARGET_DIR=$(cd "$TARGET_DIR_ARG" && pwd)
+  [ "$TARGET_DIR" = "$STARTER_ROOT" ] && err "TARGET_DIR sutampa su starter root. Naudokite be argumentų."
+  install_starter_to "$TARGET_DIR"
+  cd "$TARGET_DIR"
+  ROOT="$TARGET_DIR"
+  info "Toliau — konfigūracija kataloge: $TARGET_DIR"
+fi
 
 # --- 1. Reikalavimų patikra ---
 info "Tikrinama Python 3.9+..."
