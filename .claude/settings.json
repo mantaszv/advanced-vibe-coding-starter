@@ -116,9 +116,9 @@
         "matcher": ".*",
         "hooks": [
           {
-            "type": "prompt",
-            "prompt": "[CWK_STOP_HOOK_V1] Prieš baigiant šią sesiją: jei buvo kodo pakeitimų, patvirtinkite, kad 1) Kompiliuoja (npm run build), 2) Testai praeina (npx vitest run), 3) Be lint klaidų (npm run lint). Jei kuris žingsnis nebuvo paleistas, įspėkite vartotoją. Neblokuoti, tik priminti.",
-            "timeout": 10
+            "type": "command",
+            "command": "git diff --quiet && git diff --cached --quiet || echo '[CWK] Yra uncommitted pakeitimų. Prieš pabaigą paleiskite: npm run build && npm run lint && npx vitest run'",
+            "timeout": 5
           },
           {
             "type": "command",

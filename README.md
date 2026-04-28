@@ -2,10 +2,45 @@
 
 [![CI](https://github.com/ponasObuolys/advanced-vibe-coding-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/ponasObuolys/advanced-vibe-coding-starter/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-3.0.1-green.svg)](https://github.com/ponasObuolys/advanced-vibe-coding-starter/releases/tag/v3.0.1)
 
 Universalus starter kit moderniems Node/React projektams. Patikrintas default kelias: Next.js 16.2+ ir React 19+ su Tailwind v4, shadcn/ui, testais, CI ir AI powerpack. Vite, Supabase ir Vercel keliai dokumentuojami kaip adaptuojamos kryptys.
 
 Repozitorija skirta greitai pradėti naują produktą su aiškia architektūra, verifikacija ir AI-assisted workflow: Claude Code taisyklėmis, guard agentais, MemPalace/Memoriki žinynu, PRD → tasks pipeline ir GitHub Actions.
+
+## Naujovės v3.0.1
+
+- **MemPalace MCP integracija** — `scripts/setup.sh` automatiškai aptinka python interpretatorių su `mempalace` moduliu ir registruoja MCP serverį (`claude mcp add mempalace`).
+- **`/wiki-update` slash komanda** — paleidžia `raw/ → wiki/` Memoriki pipeline'ą: ingestina šaltinius iš `raw/`, sintezuoja entities/concepts į `wiki/`, atnaujina indeksą ir log'ą.
+- **Install mode** — `bash scripts/setup.sh /path/to/project` įdiegia starterio sluoksnį (`.claude/`, `scripts/`, `docs/` skeleton) į egzistuojantį projektą, ne tik konfigūruoja patį starter'į.
+- **Interaktyvi MCP konfigūracija** — setup'as klausia per kiekvieną iš 6 MCP serverių (Supabase, Context7, Stripe, Playwright, Vercel, Chrome DevTools), default'ai parenkami pagal aptiktą stack'ą.
+- **`rsync` vietoj `cp -n`** — install mode pataisytas BSD/macOS exit code suderinamumui.
+- **Stop hook'as nesukuria loop'o** — pakeistas iš `type: prompt` į `type: command` (non-blocking echo, kai yra uncommitted pakeitimų).
+
+Pilnas v3.0.1 aprašas: [`docs/STARTER-README.md`](docs/STARTER-README.md).
+
+## Atminties + žinių sluoksniai
+
+Starter apjungia tris atvirojo kodo projektus:
+
+| Sluoksnis | Projektas | Paskirtis |
+|---|---|---|
+| **Taisyklės** | [andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) | 4 Karpathy principai (`CLAUDE.md` §1) |
+| **Atmintis** | [MemPalace](https://github.com/MemPalace/mempalace) | Semantinė paieška + 29 MCP įrankiai. Saugykla `~/.mempalace/`, kiekvienas projektas — savo *wing*. |
+| **Žinynas** | [Memoriki](https://github.com/AyanbekDos/memoriki) | `raw/` šaltinių pipeline į `wiki/` (entities, concepts, sources, synthesis) |
+
+### `/wiki-update` workflow
+
+Kai naudotojas prašo „atnaujink wiki" arba sesijos pabaigoje:
+
+1. **Ingestinama:** skaitoma `raw/*.md`, sintezuojama į `wiki/entities/`, `wiki/concepts/`, `wiki/sources/`.
+2. **Reindeksuojama:** `mempalace mine .` perkelia naują turinį į MemPalace saugyklą.
+3. **Loginama:** `wiki/log.md` papildomas įrašu apie tai, kas buvo ingestuota ir ką pavyko sužinoti.
+4. **Konfliktai:** prieštaraujantys šaltiniai pažymimi `wiki/synthesis/conflicts.md`.
+
+Wiki failų frontmatter privalomas (`type: entity | concept | source | synthesis`, `created`, `updated`, `sources`).
+
+Detalesnis protokolas: [`CLAUDE.md`](CLAUDE.md) §3.
 
 ## Būsena
 

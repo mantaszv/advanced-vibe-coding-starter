@@ -1,7 +1,6 @@
 {
-  "name": "advanced-vibe-coding-starter",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@ponasobuolys/advanced-vibe-coding-starter",
+  "version": "3.0.1",
   "description": "Verified Next.js 16.2+ React 19 starter kit with CI, tests and AI powerpack; Vite, Supabase and Vercel as adaptation paths",
   "homepage": "https://github.com/ponasObuolys/advanced-vibe-coding-starter#readme",
   "bugs": {
@@ -10,6 +9,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ponasObuolys/advanced-vibe-coding-starter.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "public"
   },
   "author": "Ponas Obuolys <labas@ponasobuolys.lt> (https://ponasobuolys.lt)",
   "license": "MIT",
