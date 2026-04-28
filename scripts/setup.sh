@@ -62,16 +62,23 @@ source "$STARTER_ROOT/scripts/lib/cwk-pipeline.sh"
 # shellcheck disable=SC1091
 source "$STARTER_ROOT/scripts/lib/mcp-config.sh"
 # shellcheck disable=SC1091
+source "$STARTER_ROOT/scripts/lib/render-claude.sh"
+# shellcheck disable=SC1091
 source "$STARTER_ROOT/scripts/lib/install.sh"
 
-# --- 0.1 Install mode: kopijuojam scaffolding į target, tada cd į target. ---
+# --- 0.1 Target mode: cd į target PRIEŠ detect, kad detect skaitytų target'o stack'ą. ---
 if [ -n "$TARGET_DIR_ARG" ]; then
   [ -d "$TARGET_DIR_ARG" ] || err "TARGET_DIR nėra direktorija: $TARGET_DIR_ARG"
   TARGET_DIR=$(cd "$TARGET_DIR_ARG" && pwd)
   [ "$TARGET_DIR" = "$STARTER_ROOT" ] && err "TARGET_DIR sutampa su starter root. Naudokite be argumentų."
-  install_starter_to "$TARGET_DIR"
   cd "$TARGET_DIR"
   ROOT="$TARGET_DIR"
+  info "Aptinkamas target projekto stack'as: $TARGET_DIR"
+  detect_project
+  configure_project_auto
+  detect_target_state "$TARGET_DIR"
+  ok "Target stack: lang=${PROJECT_LANG:-?} framework=${PROJECT_FRAMEWORK:-?} pkg=${TARGET_PKG_MGR:-npm} karpathy_present=$TARGET_HAS_KARPATHY cwk_present=$TARGET_HAS_CWK"
+  install_starter_to "$TARGET_DIR"
   info "Toliau — konfigūracija kataloge: $TARGET_DIR"
 fi
 

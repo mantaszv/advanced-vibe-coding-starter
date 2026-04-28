@@ -153,3 +153,15 @@ Before marking a sub-task complete:
 - [ ] UI text in correct language (if applicable)
 - [ ] Task list file updated
 - [ ] All orchestration verify steps completed
+
+## Final Step: Wiki Update (po visų task'ų pabaigos)
+
+**PRIVALOMA** po to, kai visi task list pakeitimai pažymėti `[x]` ir parent task baigtas:
+
+1. Įsitikinti, kad visi orchestration POST žingsniai praėjo (build, lint, testai, language-guard).
+2. Paleisti `/wiki-update <feature-name>` su task'o pavadinimu kaip argumentu.
+3. `/wiki-update` sintetizuoja: naujus/atnaujintus `wiki/concepts/<feature>.md`, paveiktus `wiki/entities/<system>.md`, įrašą į `wiki/log.md`, cross-link'us `wiki/index.md`.
+
+Šis žingsnis NĖRA opcionalus — wiki layer'is yra projekto living memory tarp sesijų. Be jo Claude Code ateities sesijose nematys, kas ką pakeitė ir kodėl.
+
+`mempalace mine .` paleidžiamas automatiškai per Stop hook'ą (`.claude/settings.json`), todėl wiki pakeitimai automatiškai pateks į palace iki kitos sesijos.

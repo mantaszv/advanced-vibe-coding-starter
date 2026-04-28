@@ -53,11 +53,22 @@ _install_file_merged() {
   fi
 
   if grep -qF -- "$begin_line" "$dst"; then
-    awk -v begin="$begin_line" -v end="$end_line" -v block="$block" '
-      $0 == begin           { print block; in_block = 1; next }
-      in_block && $0 == end { in_block = 0; next }
-      !in_block             { print }
-    ' "$dst" > "${dst}.tmp" && mv "${dst}.tmp" "$dst"
+    local tmp body line in_block=0
+    tmp=$(mktemp)
+    body=$(cat "$src")
+    while IFS= read -r line || [ -n "$line" ]; do
+      if [ "$line" = "$begin_line" ]; then
+        printf '%s\n' "$line"
+        printf '%s\n' "$body"
+        in_block=1
+      elif [ "$in_block" = "1" ] && [ "$line" = "$end_line" ]; then
+        printf '%s\n' "$line"
+        in_block=0
+      elif [ "$in_block" = "0" ]; then
+        printf '%s\n' "$line"
+      fi
+    done < "$dst" > "$tmp"
+    mv "$tmp" "$dst"
     ok "$label: starter blokas atnaujintas (user turinys nepaliestas)"
     return 0
   fi
@@ -101,9 +112,13 @@ install_starter_to() {
     ok ".mcp.json.example sukurtas"
   fi
 
-  # 4. CLAUDE.md — projekto konstitucija (Karpathy + Memoriki + Guards + MCP).
-  # Merge'inama tarp marker'ių. Re-run pakeičia tik bloką, user turinys nepaliestas.
-  _install_file_merged "$STARTER_ROOT/CLAUDE.md" "$target/CLAUDE.md" "<!--" "-->"
+  # 4. CLAUDE.md — adaptyvus blokas, generuojamas pagal target stack'ą ir esamą turinį.
+  # Karpathy/CWK/komandos derinami pagal aptiktą būseną (žr. render-claude.sh).
+  local rendered
+  rendered=$(mktemp)
+  render_starter_claude_block "$target" "$rendered"
+  _install_file_merged "$rendered" "$target/CLAUDE.md" "<!--" "-->"
+  rm -f "$rendered"
 
   # 5. .gitignore — starter įrašai (.mcp.json, .venv, mempalace.yaml ir kt.) tarp marker'ių.
   _install_file_merged "$STARTER_ROOT/.gitignore" "$target/.gitignore" "#" ""

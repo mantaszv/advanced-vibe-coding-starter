@@ -173,3 +173,4 @@ Order requirements from lowest to highest risk. Group independent low-risk items
 5. ALWAYS perform the Mandatory Risk Assessment
 6. ALWAYS read actual source code — never assume based on names alone
 7. Reference `docs/AI-TOOLKIT.md` for available tools catalog (if installed)
+8. **Po PRD'o sukūrimo** — paleisti `/wiki-update` su PRD title kaip argumentu, kad būtų sukurtas placeholder concept (`wiki/concepts/<feature>.md`) su nuoroda į PRD failą. Tai užtikrina, kad ateities sesijos žinos apie planuojamą feature'ą prieš pradedant implementation. `/wiki-update` taip pat įrašys `wiki/log.md` įrašą su PRD reference.

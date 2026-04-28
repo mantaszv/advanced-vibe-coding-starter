@@ -105,6 +105,17 @@ BATCH VERIFY:
      - Browser snapshot → UI verification (if applicable)
   3. Run pre-deploy agent (background, if available)
   4. security-engineer agent → review (if applicable)
+  5. /wiki-update → sync wiki/concepts + wiki/log + wiki/index
+```
+
+### Wiki Update (after main task complete)
+
+```
+BATCH WIKI:
+  1. Identify what changed (git log, task file, PRD reference)
+  2. Run /wiki-update <main-task-name>
+  3. Verify: new wiki/concepts/* file, wiki/log.md entry, wiki/index.md cross-links
+  4. Stop hook automatically runs `mempalace mine .` — palace updates without manual step
 ```
 
 ## Important Rules
@@ -184,3 +195,18 @@ AI: Task 1 "Database Schema" complete!
 
     Continue with task 2 "API Endpoints"?
 ```
+
+## Auto Wiki Update After Final Main Task
+
+When the LAST main task in the task list is complete (no remaining `[ ]` parent tasks):
+
+1. Identify what changed (git log, task file, PRD reference).
+2. Run `/wiki-update <feature-name>` automatically.
+3. The `/wiki-update` command syncs:
+   - `wiki/concepts/<feature>.md` — new or updated
+   - `wiki/entities/<system>.md` — if architecture shifted
+   - `wiki/log.md` — append entry with PRD/task ref + new insights
+   - `wiki/index.md` — add cross-links
+4. Report wiki update summary alongside the final completion message.
+
+`mempalace hook run --hook stop` (configured in `.claude/settings.json`) auto-mines the new wiki files into palace at session end.

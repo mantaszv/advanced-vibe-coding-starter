@@ -210,3 +210,4 @@ Reorder tasks from lowest to highest risk.
 4. Phase 3 — risk validation (REQUIRED)
 5. Reference `docs/AI-TOOLKIT.md` as orchestration reference
 6. ALWAYS read actual source code — never guess based on names
+7. **Paskutinis parent task** privalo turėti sub-task'ą `Run /wiki-update <feature>` (Verify žingsnyje), kad implementation fazė automatiškai sintetizuotų wiki/concepts + wiki/log + wiki/index pakeitimus. Be šio žingsnio living memory layer'is liks nepilnas.

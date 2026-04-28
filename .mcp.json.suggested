@@ -1,5 +1,6 @@
 {
   "_comment": "Nukopijuokite į .mcp.json (jis .gitignore'e) ir paleiskite `chmod 600 .mcp.json`. Raw raktų ČIA NERAŠOME, naudokite ${VAR} substituciją, o env var'us pildykite iš OS keychain (macOS: Keychain Access, Linux: secret-tool, Windows: Credential Manager).",
+  "_comment_mempalace": "mempalace įrašas reikalauja `pipx install mempalace` (binary patenka į PATH). Po to `mempalace init` projekto šaknyje sukuria mempalace.yaml ir pradinę palace struktūrą. Wing pavadinimas auto-detect'inamas iš direktorijos vardo.",
   "mcpServers": {
     "context7": {
       "command": "npx",
@@ -13,6 +14,12 @@
       "args": [
         "-y",
         "chrome-devtools-mcp@latest"
+      ]
+    },
+    "mempalace": {
+      "command": "mempalace",
+      "args": [
+        "mcp"
       ]
     }
   }

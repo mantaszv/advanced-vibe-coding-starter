@@ -97,5 +97,48 @@
   "model": "opus",
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mempalace hook run --hook session-start --harness claude-code",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "[CWK_STOP_HOOK_V1] Prieš baigiant šią sesiją: jei buvo kodo pakeitimų, patvirtinkite, kad 1) Kompiliuoja (npm run build), 2) Testai praeina (npx vitest run), 3) Be lint klaidų (npm run lint). Jei kuris žingsnis nebuvo paleistas, įspėkite vartotoją. Neblokuoti, tik priminti.",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "mempalace hook run --hook stop --harness claude-code",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mempalace hook run --hook precompact --harness claude-code",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
   }
 }
