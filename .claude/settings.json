@@ -99,18 +99,6 @@
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0"
   },
   "hooks": {
-    "SessionStart": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "mempalace hook run --hook session-start --harness claude-code",
-            "timeout": 15
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "matcher": ".*",
@@ -119,23 +107,6 @@
             "type": "command",
             "command": "git diff --quiet && git diff --cached --quiet || echo '[CWK] Yra uncommitted pakeitimų. Prieš pabaigą paleiskite: npm run build && npm run lint && npx vitest run'",
             "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "mempalace hook run --hook stop --harness claude-code",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "PreCompact": [
-      {
-        "matcher": ".*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "mempalace hook run --hook precompact --harness claude-code",
-            "timeout": 20
           }
         ]
       }
