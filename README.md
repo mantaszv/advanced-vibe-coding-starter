@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/ponasObuolys/advanced-vibe-coding-starter/actions/workflows/ci.yml/badge.svg)](https://github.com/ponasObuolys/advanced-vibe-coding-starter/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-3.0.1-green.svg)](https://github.com/ponasObuolys/advanced-vibe-coding-starter/releases/tag/v3.0.1)
+[![Version](https://img.shields.io/badge/version-3.0.2-green.svg)](https://github.com/ponasObuolys/advanced-vibe-coding-starter/releases/tag/v3.0.2)
 
 Universalus starter kit moderniems Node/React projektams. Patikrintas default kelias: Next.js 16.2+ ir React 19+ su Tailwind v4, shadcn/ui, testais, CI ir AI powerpack. Vite, Supabase ir Vercel keliai dokumentuojami kaip adaptuojamos kryptys.
 
